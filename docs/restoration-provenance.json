@@ -1,0 +1,28 @@
+{
+  "release": "0.2.0",
+  "restoration_date": "2026-09-19",
+  "authority": "User approved complete v0.2.0 release; v0.1.1 restoration retained",
+  "method": "Explicit release-time CRLF-to-LF byte reconstruction; never runtime loading",
+  "source": "reference/rejected/QOFT_XI_HEX_STANDALONE_v1.1.CRLF.txt",
+  "source_bytes": 82644,
+  "source_sha256": "772bd882431107f5d1f622325a681402efbb05a76bb82df05abb7ffc6d7e0b27",
+  "crlf_pairs_replaced": 2504,
+  "target": "reference/injectors/QOFT_XI_HEX_STANDALONE_v1.1.txt",
+  "target_bytes": 80140,
+  "target_sha256": "6ee2dc6f39bbc24aee92656aa74f71020caf7d4ca4c0897a3b14c0b245242db6",
+  "scoped_sha256": "83b31740773a0ec0cc772104bf78fe4209a0161ef58b6ac8ecd20ebd4075a0c2",
+  "original_manifest_sha256": "6bfe67f552222f21b23f2c52e20bb0ed5a4a420872b8502e571ce37c2dbb538d",
+  "successor_manifest_sha256": "918266f4849ad9b64fbd4bc8db41c78bc5d934609a11c2e6ab16571121700da1",
+  "previous_successor_manifest_sha256": "9495821f63292e947d884f7754c3119fe9a90247ee73e2a41623d2b47030596d",
+  "manifest_change": "Successor CRLF pairs deliberately converted to LF; JSON values unchanged",
+  "reviewer_attestation": {
+    "date": "2026-09-19",
+    "source": "User-supplied peer review of v0.1.0 and v0.1.1",
+    "claim": "Reviewer compared restored bytes with canonical project LF copy: byte-identical",
+    "independently_reperformed_by_this_build": false
+  },
+  "injector_hash_pins_changed": false,
+  "original_inputs_preserved": true,
+  "independent_original_LF_copy_accessed": false,
+  "transport_mechanism": "UNKNOWN; Git/editor conversion not established"
+}

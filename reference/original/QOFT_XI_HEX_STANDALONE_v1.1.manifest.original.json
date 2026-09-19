@@ -1,0 +1,15 @@
+{
+  "injector_id": "QOFT_XI_HEX_STANDALONE_v1.1",
+  "filename": "QOFT_XI_HEX_STANDALONE_v1.1.txt",
+  "status": "frozen",
+  "expected_byte_length": 80140,
+  "full_file_sha256": "6ee2dc6f39bbc24aee92656aa74f71020caf7d4ca4c0897a3b14c0b245242db6",
+  "scoped_verification": {
+    "algorithm": "sha256",
+    "description": "SECTION_COUNT through the final terminal line, excluding the final trailing newline",
+    "start_offset_zero_based": 762,
+    "length_bytes": 79377,
+    "end_offset_exclusive": 80139,
+    "expected_sha256": "83b31740773a0ec0cc772104bf78fe4209a0161ef58b6ac8ecd20ebd4075a0c2"
+  }
+}

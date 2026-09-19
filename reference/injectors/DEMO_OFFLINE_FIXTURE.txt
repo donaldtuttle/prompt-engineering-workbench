@@ -1,0 +1,4 @@
+OFFLINE WORKBENCH FIXTURE v1
+This is a software-testing fixture, not the QOFT injector.
+Preserve the task exactly. No scientific or model-effectiveness claim is made.
+

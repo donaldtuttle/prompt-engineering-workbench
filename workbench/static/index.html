@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Prompt Engineering Workbench</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script defer src="/static/app.js"></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="/" aria-label="Workbench home"><span class="brand-mark">W<span>·</span></span><span>WORKBENCH<small>PROMPT ENGINEERING</small></span></a>
+    <div class="workspace-label">LOCAL WORKSPACE <span>01</span></div>
+    <button class="nav-item active" id="new-experiment"><span>+</span> New experiment</button>
+    <div class="history-heading"><span>EXPERIMENT HISTORY</span><button id="refresh-history" title="Refresh history" aria-label="Refresh history">↻</button></div>
+    <div id="history" class="history"><p class="muted">Your saved runs will appear here.</p></div>
+    <div class="sidebar-bottom"><span class="status-dot"></span> Local workspace · explicit cloud choice<small>v0.2.0 · DEVELOP · Controlled runs</small></div>
+  </aside>
+  <main>
+    <header class="topbar"><span>LAB / <strong>EXPERIMENTS</strong></span><span class="badge offline" id="mode-badge">● OFFLINE FIXTURE MODE</span></header>
+    <div class="content">
+      <section class="page-heading"><div><p class="eyebrow">CONTROLLED PROMPT EXPERIMENTS</p><h1>Experiment workspace</h1><p>One probe. Isolated conditions. A record you can inspect.</p></div><span class="version-chip">PHASE 02</span></section>
+      <div class="notice" id="mode-notice">Mock mode runs locally. Comparisons are unblinded and evaluation is not performed.</div>
+      <div id="error" class="error-box" role="alert" hidden></div>
+      <form id="experiment-form">
+        <div class="setup-grid">
+          <section class="panel probe-panel">
+            <div class="section-heading"><h2><span class="step">01</span> Task / probe</h2><button type="button" id="load-example" class="text-button">Load example ↗</button></div>
+            <div class="field-row"><div><label for="title">Experiment name</label><input id="title" maxlength="120" value="First controlled comparison" required></div><div><label for="probe-id">Probe ID</label><input id="probe-id" maxlength="120" value="probe-001" required></div></div>
+            <label for="task">Exact task text</label>
+            <textarea id="task" rows="8" maxlength="20000" required placeholder="Enter the same task for all conditions…"></textarea>
+            <div class="editor-footer"><span>UTF-8 · whitespace preserved as submitted</span><span id="char-count">0 characters</span></div>
+          </section>
+          <section class="panel injector-panel">
+            <div class="section-heading"><h2><span class="step">02</span> Injector &amp; integrity</h2><span id="artifact-status" class="badge">LOADING</span></div>
+            <label for="artifact">Approved local artifact</label><select id="artifact"></select>
+            <div id="artifact-detail" class="artifact-detail"></div>
+            <details class="integrity-details"><summary>Verification details</summary><div id="verification-details"></div></details>
+          </section>
+        </div>
+        <section class="panel run-panel">
+          <div class="section-heading"><h2><span class="step">03</span> Run configuration</h2><span class="muted small">Independent lanes · no shared conversation</span></div>
+          <div class="config-grid"><div class="provider-field"><label for="provider">Provider / model</label><select id="provider"><option value="mock">Mock · fixture-echo-v2 (local)</option><option value="openai" disabled>OpenAI · loading availability</option><option disabled>Ollama — planned, unavailable</option></select></div><div><label for="concurrency">Lane limit</label><select id="concurrency"><option>1</option><option selected>2</option><option>3</option><option>4</option></select></div><div><label for="timeout">Timeout (s)</label><input id="timeout" type="number" min="1" max="300" value="30" required></div><div><label for="retries">Retries</label><select id="retries"><option>0</option><option>1</option><option>2</option></select></div></div>
+          <div class="config-grid advanced-config">
+            <div><label for="delivery">Delivery mode</label><select id="delivery"><option>SYSTEM_SLOT</option><option>USER_PASTE</option><option>USER_PASTE_WITH_HANDSHAKE</option></select></div>
+            <div><label for="replicates">Replicates</label><input id="replicates" type="number" min="1" max="4" value="1" required></div>
+            <div><label for="temperature">Temperature (blank = default)</label><input id="temperature" type="number" min="0" max="2" step="0.1"></div>
+            <div><label for="seed">Seed (mock only)</label><input id="seed" type="number" min="0" max="2147483647"></div>
+            <div><label for="model">Requested model / snapshot</label><input id="model" value="fixture-echo-v2" maxlength="160" required readonly></div>
+            <div><label for="top-p">Top P (blank = default)</label><input id="top-p" type="number" min="0.01" max="1" step="0.01"></div>
+            <div><label for="max-tokens">Max output tokens / call</label><input id="max-tokens" type="number" min="16" max="8192" value="512" required></div>
+          </div>
+          <label id="cloud-confirmation" class="cloud-confirmation" hidden><input type="checkbox" id="cloud-consent"> Send this probe and its context to OpenAI. API charges apply, including handshake calls and retries.</label>
+          <p class="muted small">Neutral control matches context tokens in the bundled o200k_base tokenizer. A repeated word is a comparison input; semantic neutrality is not established. Handshake mode adds a preparation call to every lane.</p>
+          <div class="run-bottom"><div class="lane-preview" id="lane-preview">Baseline + Injector + Neutral control</div><div class="run-action"><span id="charge-note">No API keys · no API charges</span><button type="submit" id="run-button" class="primary">Run experiment <span>↗</span></button></div></div>
+        </section>
+      </form>
+      <section class="results-section" aria-label="Experiment results">
+        <div class="results-heading"><div><p class="eyebrow">INSPECT THE OUTPUT</p><h2>Response comparison <span id="experiment-status" class="badge" hidden></span></h2></div><div class="exports"><button id="replay" class="secondary" disabled>Replay snapshot</button><button id="reuse" class="secondary" disabled>Reuse setup</button><button id="export-json" class="secondary" disabled>Export JSON ↓</button><button id="export-jsonl" class="secondary" disabled>JSONL ↓</button></div></div>
+        <p id="record-meta" class="muted small">Run an experiment to create an immutable input snapshot and a saved record.</p>
+        <div id="results" class="results-grid"><div class="empty-state"><div class="empty-symbol">⇄</div><h3>Your comparison starts here</h3><p>Baseline, injector, and length-control responses will appear in separate lanes.<br>Each lane keeps its own prompt hash, status, and timing.</p></div></div>
+        <div id="audit-note" class="audit-note" hidden>Evaluation: not performed · Outcome: INSUFFICIENT_EVIDENCE · Unblinded impressions are not scored evidence.</div>
+        <details id="input-snapshot" class="panel snapshot" hidden><summary>Inspect stored probe &amp; input identities</summary><div id="snapshot-content"></div></details>
+      </section>
+      <footer><span>LOCAL-FIRST / EXACT INPUTS / AUDITABLE RECORDS</span><span>Prompt Engineering Workbench · 0.2.0</span></footer>
+    </div>
+  </main>
+</body>
+</html>

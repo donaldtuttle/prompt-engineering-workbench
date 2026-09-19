@@ -1,0 +1,159 @@
+{
+  "export_schema": "workbench-export-v1",
+  "exported_at": "2026-09-19T17:07:48.240241+00:00",
+  "experiment": {
+    "schema_version": "workbench-experiment-v1",
+    "experiment_id": "4351083e-d8c3-4b3a-a8d8-ec88944d22a3",
+    "created_at": "2026-09-19T17:07:47.394742+00:00",
+    "ended_at": "2026-09-19T17:07:47.548349+00:00",
+    "request": {
+      "task": "  Ξ · Test exact input\n<script>window.UNSAFE = true</script>\nDo not trim.  ",
+      "title": "Browser smoke · demo comparison",
+      "probe_id": "probe-001",
+      "artifact_id": "DEMO_OFFLINE_FIXTURE",
+      "provider": "mock",
+      "concurrency": 2,
+      "timeout_seconds": 10.0,
+      "max_retries": 0
+    },
+    "task_sha256": "e1d4751b3b9de866668f8a0eae471a8b86634a32597676988585195a171bb774",
+    "status": "COMPLETED",
+    "resolution": "INSUFFICIENT_EVIDENCE",
+    "evidence_scope": "SOFTWARE_FIXTURE_ONLY; no LLM or QOFT mechanism tested",
+    "artifact": {
+      "identity": {
+        "artifact_id": "DEMO_OFFLINE_FIXTURE",
+        "source_path": "reference/injectors/DEMO_OFFLINE_FIXTURE.txt",
+        "byte_length": 168,
+        "sha256": "adb50bebae4e3576c2c96c70866f4d1357888c35b2e13d76d2c88383870fc541",
+        "encoding": "UTF-8",
+        "line_endings": "LF",
+        "loaded_at": "2026-09-19T17:07:47.394666+00:00",
+        "status": "VALID",
+        "expected_byte_length": 168,
+        "expected_sha256": "adb50bebae4e3576c2c96c70866f4d1357888c35b2e13d76d2c88383870fc541",
+        "scoped_sha256": null,
+        "expected_scoped_sha256": null,
+        "manifest_sha256": "68893def8f842d69508d939e2e7a6a6e3ff9a5ec6934c6141e6fbb0e0098d6a7",
+        "diagnostics": []
+      },
+      "bytes_base64": "T0ZGTElORSBXT1JLQkVOQ0ggRklYVFVSRSB2MQpUaGlzIGlzIGEgc29mdHdhcmUtdGVzdGluZyBmaXh0dXJlLCBub3QgdGhlIFFPRlQgaW5qZWN0b3IuClByZXNlcnZlIHRoZSB0YXNrIGV4YWN0bHkuIE5vIHNjaWVudGlmaWMgb3IgbW9kZWwtZWZmZWN0aXZlbmVzcyBjbGFpbSBpcyBtYWRlLgoK",
+      "manifest_bytes_base64": "ewogICJpbmplY3Rvcl9pZCI6ICJERU1PX09GRkxJTkVfRklYVFVSRV92MSIsCiAgImZpbGVuYW1lIjogIkRFTU9fT0ZGTElORV9GSVhUVVJFLnR4dCIsCiAgInN0YXR1cyI6ICJzb2Z0d2FyZS10ZXN0LWZpeHR1cmUtbm90LVFPRlQiLAogICJleHBlY3RlZF9ieXRlX2xlbmd0aCI6IDE2OCwKICAiZnVsbF9maWxlX3NoYTI1NiI6ICJhZGI1MGJlYmFlNGUzNTc2YzJjOTZjNzA4NjZmNGQxMzU3ODg4YzM1YjJlMTNkNzZkMmM4ODM4Mzg3MGZjNTQxIgp9Cg=="
+    },
+    "runs": [
+      {
+        "run_id": "37052f74-b302-4ee5-90b0-8a388120d9ac",
+        "experiment_id": "4351083e-d8c3-4b3a-a8d8-ec88944d22a3",
+        "probe_id": "probe-001",
+        "condition_id": "BASELINE",
+        "condition": {
+          "condition_id": "BASELINE",
+          "injector": null,
+          "messages": [
+            {
+              "role": "user",
+              "content": "  Ξ · Test exact input\n<script>window.UNSAFE = true</script>\nDo not trim.  "
+            }
+          ],
+          "prompt_hash": "7166fb2ed29f0174f1abc6b7445b9e09276247398487ca3e45e11b0ee530b6a8",
+          "prompt_byte_length": 109,
+          "assembly_version": "messages-json-v1"
+        },
+        "provider": "mock",
+        "model": "fixture-echo-v1",
+        "model_settings": {
+          "deterministic": true
+        },
+        "execution": "local-offline",
+        "status": "SUCCEEDED",
+        "started_at": "2026-09-19T17:07:47.396086+00:00",
+        "ended_at": "2026-09-19T17:07:47.547102+00:00",
+        "latency_ms": 151.011,
+        "attempts": 1,
+        "retries": 0,
+        "result": {
+          "raw_response": "{\n  \"kind\": \"OFFLINE_FIXTURE\",\n  \"notice\": \"Synthetic acknowledgement only. No model answered or evaluated this task.\",\n  \"task_received\": \"  Ξ · Test exact input\\n<script>window.UNSAFE = true</script>\\nDo not trim.  \",\n  \"message_count\": 1,\n  \"injector_present\": false,\n  \"assembled_prompt_sha256\": \"7166fb2ed29f0174f1abc6b7445b9e09276247398487ca3e45e11b0ee530b6a8\"\n}",
+          "structured_response": {
+            "kind": "OFFLINE_FIXTURE",
+            "notice": "Synthetic acknowledgement only. No model answered or evaluated this task.",
+            "task_received": "  Ξ · Test exact input\n<script>window.UNSAFE = true</script>\nDo not trim.  ",
+            "message_count": 1,
+            "injector_present": false,
+            "assembled_prompt_sha256": "7166fb2ed29f0174f1abc6b7445b9e09276247398487ca3e45e11b0ee530b6a8"
+          },
+          "token_usage": null,
+          "cost_usd": null,
+          "trace_id": null
+        },
+        "errors": [],
+        "evaluation": null
+      },
+      {
+        "run_id": "2ab9b393-a52a-4ef7-b8e9-693fb11113d8",
+        "experiment_id": "4351083e-d8c3-4b3a-a8d8-ec88944d22a3",
+        "probe_id": "probe-001",
+        "condition_id": "FULL_INJECTOR",
+        "condition": {
+          "condition_id": "FULL_INJECTOR",
+          "injector": {
+            "artifact_id": "DEMO_OFFLINE_FIXTURE",
+            "source_path": "reference/injectors/DEMO_OFFLINE_FIXTURE.txt",
+            "byte_length": 168,
+            "sha256": "adb50bebae4e3576c2c96c70866f4d1357888c35b2e13d76d2c88383870fc541",
+            "encoding": "UTF-8",
+            "line_endings": "LF",
+            "loaded_at": "2026-09-19T17:07:47.394666+00:00",
+            "status": "VALID",
+            "expected_byte_length": 168,
+            "expected_sha256": "adb50bebae4e3576c2c96c70866f4d1357888c35b2e13d76d2c88383870fc541",
+            "scoped_sha256": null,
+            "expected_scoped_sha256": null,
+            "manifest_sha256": "68893def8f842d69508d939e2e7a6a6e3ff9a5ec6934c6141e6fbb0e0098d6a7",
+            "diagnostics": []
+          },
+          "messages": [
+            {
+              "role": "system",
+              "content": "OFFLINE WORKBENCH FIXTURE v1\nThis is a software-testing fixture, not the QOFT injector.\nPreserve the task exactly. No scientific or model-effectiveness claim is made.\n\n"
+            },
+            {
+              "role": "user",
+              "content": "  Ξ · Test exact input\n<script>window.UNSAFE = true</script>\nDo not trim.  "
+            }
+          ],
+          "prompt_hash": "9109ee669b93c766f8e4fa9345552afd2f3e78581f17c136ea415b6d13ba70e4",
+          "prompt_byte_length": 312,
+          "assembly_version": "messages-json-v1"
+        },
+        "provider": "mock",
+        "model": "fixture-echo-v1",
+        "model_settings": {
+          "deterministic": true
+        },
+        "execution": "local-offline",
+        "status": "SUCCEEDED",
+        "started_at": "2026-09-19T17:07:47.396492+00:00",
+        "ended_at": "2026-09-19T17:07:47.547896+00:00",
+        "latency_ms": 151.406,
+        "attempts": 1,
+        "retries": 0,
+        "result": {
+          "raw_response": "{\n  \"kind\": \"OFFLINE_FIXTURE\",\n  \"notice\": \"Synthetic acknowledgement only. No model answered or evaluated this task.\",\n  \"task_received\": \"  Ξ · Test exact input\\n<script>window.UNSAFE = true</script>\\nDo not trim.  \",\n  \"message_count\": 2,\n  \"injector_present\": true,\n  \"assembled_prompt_sha256\": \"9109ee669b93c766f8e4fa9345552afd2f3e78581f17c136ea415b6d13ba70e4\"\n}",
+          "structured_response": {
+            "kind": "OFFLINE_FIXTURE",
+            "notice": "Synthetic acknowledgement only. No model answered or evaluated this task.",
+            "task_received": "  Ξ · Test exact input\n<script>window.UNSAFE = true</script>\nDo not trim.  ",
+            "message_count": 2,
+            "injector_present": true,
+            "assembled_prompt_sha256": "9109ee669b93c766f8e4fa9345552afd2f3e78581f17c136ea415b6d13ba70e4"
+          },
+          "token_usage": null,
+          "cost_usd": null,
+          "trace_id": null
+        },
+        "errors": [],
+        "evaluation": null
+      }
+    ]
+  }
+}

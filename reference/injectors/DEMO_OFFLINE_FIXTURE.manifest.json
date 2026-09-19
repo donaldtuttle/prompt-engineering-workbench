@@ -1,0 +1,7 @@
+{
+  "injector_id": "DEMO_OFFLINE_FIXTURE_v1",
+  "filename": "DEMO_OFFLINE_FIXTURE.txt",
+  "status": "software-test-fixture-not-QOFT",
+  "expected_byte_length": 168,
+  "full_file_sha256": "adb50bebae4e3576c2c96c70866f4d1357888c35b2e13d76d2c88383870fc541"
+}

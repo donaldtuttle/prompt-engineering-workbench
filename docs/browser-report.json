@@ -1,0 +1,32 @@
+{
+  "status": "PASS",
+  "browser": "134.0.6998.35",
+  "release": "0.2.0",
+  "checks": [
+    "page render",
+    "three isolated lanes",
+    "XSS text escaping",
+    "JSON download",
+    "JSONL download",
+    "history after reload",
+    "reuse setup",
+    "restored QOFT VALID",
+    "restored QOFT three-condition run",
+    "QOFT export exact full and scope hashes",
+    "CRLF treatment blocked",
+    "baseline still succeeds",
+    "390px no overflow",
+    "baseline-only run",
+    "no JS errors",
+    "no external browser requests",
+    "release sources unchanged",
+    "handshake two-call transcripts",
+    "replicate indices",
+    "seed settings preserved",
+    "snapshot replay after disk corruption",
+    "replay final hashes match",
+    "replay uses one task call",
+    "invalid neutral control blocked"
+  ],
+  "output": "/workspace/scratch/d958f029cc27/prompt-engineering-workbench-v0.2.0/test-results"
+}

@@ -1,0 +1,455 @@
+{
+  "pattern_definitions": {},
+  "pattern_totals": {},
+  "roots": [
+    {
+      "exists": true,
+      "files": [
+        {
+          "archive": {
+            "duplicate_member_names": [],
+            "member_count": 23,
+            "members": [
+              {
+                "compressed_bytes": 0,
+                "crc32": "00000000",
+                "directory": true,
+                "duplicate_name": false,
+                "name": "Prompt Engineering Workbench/",
+                "uncompressed_bytes": 0,
+                "unsafe_name": []
+              },
+              {
+                "bytes": 10534,
+                "compressed_bytes": 4203,
+                "crc32": "bcc48aee",
+                "directory": false,
+                "duplicate_name": false,
+                "lf_normalized_sha256": "c6873fda86103d370255475a1ced0c7498627436ae20487b8be7845b857d205e",
+                "line_endings": {
+                  "cr_only": 0,
+                  "crlf": 770,
+                  "lf_only": 0,
+                  "style": "CRLF"
+                },
+                "name": "Prompt Engineering Workbench/AGENTS.md",
+                "patterns": {},
+                "sha256": "e9914b71fa45cf8c89b61bbd4303bb8fed25d48f9f6416742eb35abada1079fc",
+                "text": true,
+                "uncompressed_bytes": 10534,
+                "unsafe_name": []
+              },
+              {
+                "bytes": 3270,
+                "compressed_bytes": 1654,
+                "crc32": "6b62062c",
+                "directory": false,
+                "duplicate_name": false,
+                "lf_normalized_sha256": "fc20640f414aedce6f4ac078ad8ae3d6d00dba46fbca0c4b1684debd6c7adf07",
+                "line_endings": {
+                  "cr_only": 0,
+                  "crlf": 115,
+                  "lf_only": 0,
+                  "style": "CRLF"
+                },
+                "name": "Prompt Engineering Workbench/ChatGPT Project AI instructions.txt",
+                "patterns": {},
+                "sha256": "0dd10403629fdcd0f5904436ab8ba9f3574d1aa42c8134b4ebdd0409bd0ba6dc",
+                "text": true,
+                "uncompressed_bytes": 3270,
+                "unsafe_name": []
+              },
+              {
+                "bytes": 647,
+                "compressed_bytes": 376,
+                "crc32": "b1d033c8",
+                "directory": false,
+                "duplicate_name": false,
+                "lf_normalized_sha256": "e9dfaa6d4bbcd2fda3dfc37f8e800916b8ecebab0c9a2349fde63e50a2c55c50",
+                "line_endings": {
+                  "cr_only": 0,
+                  "crlf": 6,
+                  "lf_only": 0,
+                  "style": "CRLF"
+                },
+                "name": "Prompt Engineering Workbench/ChatGPT Project description.txt",
+                "patterns": {},
+                "sha256": "c16d5757f2f9517084fa2ecd843952d653ea516a179a1145186f1d9eaea5baa2",
+                "text": true,
+                "uncompressed_bytes": 647,
+                "unsafe_name": []
+              },
+              {
+                "bytes": 184,
+                "compressed_bytes": 123,
+                "crc32": "29b002f8",
+                "directory": false,
+                "duplicate_name": false,
+                "lf_normalized_sha256": "9eb0f4348a4a46f50bc5d7a3eb35a2dcca6c73b28d34a8cfa102a83ced9a3149",
+                "line_endings": {
+                  "cr_only": 0,
+                  "crlf": 12,
+                  "lf_only": 0,
+                  "style": "CRLF"
+                },
+                "name": "Prompt Engineering Workbench/Codex development actions.txt",
+                "patterns": {},
+                "sha256": "5f7e3734dd92ae0fe93dd67977c14e91a7af888ed55781a6ffa7df908d42a60b",
+                "text": true,
+                "uncompressed_bytes": 184,
+                "unsafe_name": []
+              },
+              {
+                "bytes": 2089,
+                "compressed_bytes": 1023,
+                "crc32": "77c6fbfa",
+                "directory": false,
+                "duplicate_name": false,
+                "lf_normalized_sha256": "21b637db3008b9d0ebc3488ef657ee5c9d1cf12e075ca914b928183c0db1e572",
+                "line_endings": {
+                  "cr_only": 0,
+                  "crlf": 100,
+                  "lf_only": 0,
+                  "style": "CRLF"
+                },
+                "name": "Prompt Engineering Workbench/Development workflow after that first turn.txt",
+                "patterns": {},
+                "sha256": "f85cbb0aedd38597be88d237ef7722c7d342f88ae4238a41b6ff22e682159bce",
+                "text": true,
+                "uncompressed_bytes": 2089,
+                "unsafe_name": []
+              },
+              {
+                "bytes": 5582,
+                "compressed_bytes": 2515,
+                "crc32": "7dcd21f6",
+                "directory": false,
+                "duplicate_name": false,
+                "lf_normalized_sha256": "b20b20d2461704c29e37760f017ec36bd6a3b7354d0307ad3ef23dbe49777428",
+                "line_endings": {
+                  "cr_only": 0,
+                  "crlf": 208,
+                  "lf_only": 0,
+                  "style": "CRLF"
+                },
+                "name": "Prompt Engineering Workbench/First Codex prompt.txt",
+                "patterns": {},
+                "sha256": "1b86eb8f0578abbe4777e08a75097f60067fe6f8f07a213e31845cfda2951773",
+                "text": true,
+                "uncompressed_bytes": 5582,
+                "unsafe_name": []
+              },
+              {
+                "bytes": 423,
+                "compressed_bytes": 263,
+                "crc32": "159d97ee",
+                "directory": false,
+                "duplicate_name": false,
+                "lf_normalized_sha256": "12f9840e42edf911ec700466967c7dddce0717b6044f345c86427b7a883277ff",
+                "line_endings": {
+                  "cr_only": 0,
+                  "crlf": 9,
+                  "lf_only": 0,
+                  "style": "CRLF"
+                },
+                "name": "Prompt Engineering Workbench/Innovation flags to preserve.txt",
+                "patterns": {},
+                "sha256": "313df6fb165f84efa6254a6a1362fa00afc80b99b0b6cd634e988014358b4890",
+                "text": true,
+                "uncompressed_bytes": 423,
+                "unsafe_name": []
+              },
+              {
+                "bytes": 3169,
+                "compressed_bytes": 1376,
+                "crc32": "d7f08bbb",
+                "directory": false,
+                "duplicate_name": false,
+                "lf_normalized_sha256": "6ffb7812e33f37991f5ecb160e667247e0d6beca033ad9ee3f2ccf5414dd2eb4",
+                "line_endings": {
+                  "cr_only": 0,
+                  "crlf": 206,
+                  "lf_only": 0,
+                  "style": "CRLF"
+                },
+                "name": "Prompt Engineering Workbench/Project_Brief.md",
+                "patterns": {},
+                "sha256": "1f8b289acef1910ef3bbefc13011951d44e2e72fc973405e578fc8ed9c9f543d",
+                "text": true,
+                "uncompressed_bytes": 3169,
+                "unsafe_name": []
+              },
+              {
+                "compressed_bytes": 0,
+                "crc32": "00000000",
+                "directory": true,
+                "duplicate_name": false,
+                "name": "Prompt Engineering Workbench/docs/",
+                "uncompressed_bytes": 0,
+                "unsafe_name": []
+              },
+              {
+                "compressed_bytes": 0,
+                "crc32": "00000000",
+                "directory": true,
+                "duplicate_name": false,
+                "name": "Prompt Engineering Workbench/docs/history/",
+                "uncompressed_bytes": 0,
+                "unsafe_name": []
+              },
+              {
+                "bytes": 37241,
+                "compressed_bytes": 12691,
+                "crc32": "96947bd8",
+                "directory": false,
+                "duplicate_name": false,
+                "lf_normalized_sha256": "29e3d3ee9684191e1163687a2c39828514a87c76bca4c504b82bcdcd54051a52",
+                "line_endings": {
+                  "cr_only": 0,
+                  "crlf": 1766,
+                  "lf_only": 0,
+                  "style": "CRLF"
+                },
+                "name": "Prompt Engineering Workbench/docs/history/original_design_conversation.md",
+                "patterns": {},
+                "sha256": "ecbce84aee3e4dfcb228b88d24d8e51b77bf6dfd25236d647002d1456924e294",
+                "text": true,
+                "uncompressed_bytes": 37241,
+                "unsafe_name": []
+              },
+              {
+                "bytes": 3547,
+                "compressed_bytes": 871,
+                "crc32": "9aa0b7d0",
+                "directory": false,
+                "duplicate_name": false,
+                "lf_normalized_sha256": "27336dce70f7451223f4d4cec5153998c4dfb72bb5f2defc1f2601b83dc09975",
+                "line_endings": {
+                  "cr_only": 0,
+                  "crlf": 0,
+                  "lf_only": 164,
+                  "style": "LF"
+                },
+                "name": "Prompt Engineering Workbench/gitignore",
+                "patterns": {},
+                "sha256": "27336dce70f7451223f4d4cec5153998c4dfb72bb5f2defc1f2601b83dc09975",
+                "text": true,
+                "uncompressed_bytes": 3547,
+                "unsafe_name": []
+              },
+              {
+                "compressed_bytes": 0,
+                "crc32": "00000000",
+                "directory": true,
+                "duplicate_name": false,
+                "name": "Prompt Engineering Workbench/legacy_recursive_agents/",
+                "uncompressed_bytes": 0,
+                "unsafe_name": []
+              },
+              {
+                "bytes": 35156,
+                "compressed_bytes": 8506,
+                "crc32": "37404e2c",
+                "directory": false,
+                "duplicate_name": false,
+                "lf_normalized_sha256": "80646ae322e5b7748c37230828bad8f61332976b3f29a42903a5ac878f459961",
+                "line_endings": {
+                  "cr_only": 979,
+                  "crlf": 979,
+                  "lf_only": 0,
+                  "style": "MIXED"
+                },
+                "name": "Prompt Engineering Workbench/legacy_recursive_agents/Autonomous RecursiveGPT Agent.txt",
+                "patterns": {},
+                "sha256": "7b18e1ddf5ccf65e33e25ed0666e4d43828d435f3f96687e221a42e83729dec8",
+                "text": true,
+                "uncompressed_bytes": 35156,
+                "unsafe_name": []
+              },
+              {
+                "bytes": 392,
+                "compressed_bytes": 92,
+                "crc32": "b42bb04d",
+                "directory": false,
+                "duplicate_name": false,
+                "lf_normalized_sha256": "84efc2434bebe4073885a45210c81744f9dc3eb1b03c597b4f87b4d3300e7d62",
+                "line_endings": {
+                  "cr_only": 0,
+                  "crlf": 0,
+                  "lf_only": 21,
+                  "style": "LF"
+                },
+                "name": "Prompt Engineering Workbench/legacy_recursive_agents/rgpt_adaptive_agent_traces.json",
+                "patterns": {},
+                "sha256": "84efc2434bebe4073885a45210c81744f9dc3eb1b03c597b4f87b4d3300e7d62",
+                "text": true,
+                "uncompressed_bytes": 392,
+                "unsafe_name": []
+              },
+              {
+                "bytes": 13919,
+                "compressed_bytes": 4411,
+                "crc32": "f045b805",
+                "directory": false,
+                "duplicate_name": false,
+                "lf_normalized_sha256": "d15f69ebe0827a744fb76e0d8b361bcb1aaac4e9a98033a4394cca8a0c10f375",
+                "line_endings": {
+                  "cr_only": 399,
+                  "crlf": 399,
+                  "lf_only": 0,
+                  "style": "MIXED"
+                },
+                "name": "Prompt Engineering Workbench/legacy_recursive_agents/ΞΣΩ Recursive Agent Model.txt",
+                "patterns": {},
+                "sha256": "36d7c61fd3b2c347278dc4051dbf7373ea6d46ee0f787d9ba1e7b1f98082fdbf",
+                "text": true,
+                "uncompressed_bytes": 13919,
+                "unsafe_name": []
+              },
+              {
+                "bytes": 1869,
+                "compressed_bytes": 941,
+                "crc32": "1ecf8d2f",
+                "directory": false,
+                "duplicate_name": false,
+                "lf_normalized_sha256": "39049c358437ffa36e3352436851b387010fcad5649c54b3f8a7267008863601",
+                "line_endings": {
+                  "cr_only": 75,
+                  "crlf": 75,
+                  "lf_only": 0,
+                  "style": "MIXED"
+                },
+                "name": "Prompt Engineering Workbench/legacy_recursive_agents/ΞΣΩ Recursive Agent Simulation.txt",
+                "patterns": {},
+                "sha256": "114d2395a3a0927df3774bdccc309ef6185e771451f4470103de107f79c214af",
+                "text": true,
+                "uncompressed_bytes": 1869,
+                "unsafe_name": []
+              },
+              {
+                "compressed_bytes": 0,
+                "crc32": "00000000",
+                "directory": true,
+                "duplicate_name": false,
+                "name": "Prompt Engineering Workbench/probes/",
+                "uncompressed_bytes": 0,
+                "unsafe_name": []
+              },
+              {
+                "compressed_bytes": 0,
+                "crc32": "00000000",
+                "directory": true,
+                "duplicate_name": false,
+                "name": "Prompt Engineering Workbench/reference/",
+                "uncompressed_bytes": 0,
+                "unsafe_name": []
+              },
+              {
+                "compressed_bytes": 0,
+                "crc32": "00000000",
+                "directory": true,
+                "duplicate_name": false,
+                "name": "Prompt Engineering Workbench/reference/injectors/",
+                "uncompressed_bytes": 0,
+                "unsafe_name": []
+              },
+              {
+                "bytes": 586,
+                "compressed_bytes": 365,
+                "crc32": "cbda7834",
+                "directory": false,
+                "duplicate_name": false,
+                "lf_normalized_sha256": "669330f38d6b5dc9d6257387c863575f3448ff36f86caef5eb06d62255cc1cac",
+                "line_endings": {
+                  "cr_only": 0,
+                  "crlf": 14,
+                  "lf_only": 0,
+                  "style": "CRLF"
+                },
+                "name": "Prompt Engineering Workbench/reference/injectors/QOFT_XI_HEX_STANDALONE_v1.1.manifest.json",
+                "patterns": {},
+                "sha256": "3326641f1c005358c135231107877dd3767c1e2b226af6c4f643d42525bd1160",
+                "text": true,
+                "uncompressed_bytes": 586,
+                "unsafe_name": []
+              },
+              {
+                "bytes": 82644,
+                "compressed_bytes": 23058,
+                "crc32": "253e99fb",
+                "directory": false,
+                "duplicate_name": false,
+                "lf_normalized_sha256": "6ee2dc6f39bbc24aee92656aa74f71020caf7d4ca4c0897a3b14c0b245242db6",
+                "line_endings": {
+                  "cr_only": 0,
+                  "crlf": 2504,
+                  "lf_only": 0,
+                  "style": "CRLF"
+                },
+                "name": "Prompt Engineering Workbench/reference/injectors/QOFT_XI_HEX_STANDALONE_v1.1_FINAL.txt",
+                "patterns": {},
+                "sha256": "772bd882431107f5d1f622325a681402efbb05a76bb82df05abb7ffc6d7e0b27",
+                "text": true,
+                "uncompressed_bytes": 82644,
+                "unsafe_name": []
+              }
+            ],
+            "unsafe_member_count": 0
+          },
+          "bytes": 68514,
+          "kind": "file",
+          "path": "11-Prompt-Engineering-Workbench.zip",
+          "sha256": "5bb21b5afcd5c29e63b8b06baf4a985d6f8d68e1cf399c94dfa5b3afe06d4367",
+          "text": false,
+          "zip": true
+        }
+      ],
+      "root": "/workspace/scratch/d958f029cc27/project_sources/11-Prompt-Engineering-Workbench.zip"
+    },
+    {
+      "exists": true,
+      "files": [
+        {
+          "bytes": 611,
+          "kind": "file",
+          "lf_normalized_sha256": "fd368c0111fdb005ee943245bffd2d318d359fb7f5936c9b1224662ee856257d",
+          "line_endings": {
+            "cr_only": 0,
+            "crlf": 14,
+            "lf_only": 0,
+            "style": "CRLF"
+          },
+          "path": "17-QOFT_XI_HEX_STANDALONE_v1.1.manifest.json",
+          "patterns": {},
+          "sha256": "6bfe67f552222f21b23f2c52e20bb0ed5a4a420872b8502e571ce37c2dbb538d",
+          "text": true,
+          "zip": false
+        }
+      ],
+      "root": "/workspace/scratch/d958f029cc27/project_sources/17-QOFT_XI_HEX_STANDALONE_v1.1.manifest.json"
+    },
+    {
+      "exists": true,
+      "files": [
+        {
+          "bytes": 82644,
+          "kind": "file",
+          "lf_normalized_sha256": "6ee2dc6f39bbc24aee92656aa74f71020caf7d4ca4c0897a3b14c0b245242db6",
+          "line_endings": {
+            "cr_only": 0,
+            "crlf": 2504,
+            "lf_only": 0,
+            "style": "CRLF"
+          },
+          "path": "39-28-QOFT_XI_HEX_STANDALONE_v1.1.txt",
+          "patterns": {},
+          "sha256": "772bd882431107f5d1f622325a681402efbb05a76bb82df05abb7ffc6d7e0b27",
+          "text": true,
+          "zip": false
+        }
+      ],
+      "root": "/workspace/scratch/d958f029cc27/project_sources/39-28-QOFT_XI_HEX_STANDALONE_v1.1.txt"
+    }
+  ],
+  "schema": "qoft-corpus-manifest/v1"
+}

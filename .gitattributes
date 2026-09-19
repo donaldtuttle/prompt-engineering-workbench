@@ -1,0 +1,4 @@
+reference/** -text
+tests/fixtures/** -text
+AGENTS.md -text
+PROJECT_BRIEF.md -text
