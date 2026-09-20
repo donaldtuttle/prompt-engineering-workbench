@@ -9,6 +9,15 @@ Live-account compatibility, model availability, and injector effectiveness remai
 
 This is a complete source release. Existing users: read [UPGRADE.md](UPGRADE.md) first.
 
+## Three-Lane Probe companion
+
+[Open the original Grok demo](https://cactus-umbra-vivid-lunar.grok.me/) — a public
+DEMO-only viewport of the three-condition idea, separate from this local harness.
+The [offline protocol reconstruction](examples/three_lane_probe/README.md) reproduces
+its message assembly, hashes, delivery modes, and tamper checks without API keys.
+**Partial / DEVELOP:** the browser UI and live Grok backend have not been ported.
+See [source inspection, tests, and remaining work](docs/THREE_LANE_RECONSTRUCTION.md).
+
 ## Run locally
 
 Install Python 3.12+ and uv, extract into a new folder, and open a terminal there:
