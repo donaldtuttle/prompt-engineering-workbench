@@ -9,8 +9,8 @@ from fastapi.testclient import TestClient
 from workbench.app import ROOT, create_app
 from workbench.artifacts import ArtifactStore, digest
 from workbench.controller import Controller, assemble
-from workbench.models import RunRequest
-from workbench.providers import MockProvider, OllamaProvider, OpenAIProvider
+from workbench.models import RunRequest, SamplingSettings
+from workbench.providers import MockProvider, OllamaProvider, OpenAIProvider, ollama_base_url
 from workbench.repository import Repository
 
 DEMO_HASH = "adb50bebae4e3576c2c96c70866f4d1357888c35b2e13d76d2c88383870fc541"
@@ -411,11 +411,52 @@ def test_unknown_records_and_export_type(client):
 def test_providers_disabled_without_keys(client):
     providers = client.get("/api/providers").json()
     assert [p["enabled"] for p in providers] == [True, False, False]
-    with pytest.raises(NotImplementedError):
-        asyncio.run(OllamaProvider().generate(assemble("test")))
     request = RunRequest(task="test", provider="openai", model="test-model", cloud_consent=True)
     with pytest.raises(RuntimeError):
         asyncio.run(OpenAIProvider(request).generate(assemble("test")))
+
+
+def test_ollama_provider_uses_loopback_chat_contract():
+    captured = {}
+
+    def transport(path, payload, timeout):
+        captured.update(path=path, payload=payload, timeout=timeout)
+        return {
+            "model": "llama3.2:latest",
+            "message": {"role": "assistant", "content": "Local answer"},
+            "done": True,
+            "done_reason": "stop",
+            "prompt_eval_count": 11,
+            "eval_count": 4,
+        }
+
+    request = RunRequest(
+        task="test",
+        provider="ollama",
+        model="llama3.2:latest",
+        timeout_seconds=45,
+        sampling=SamplingSettings(temperature=0.2, top_p=0.9, seed=7, max_output_tokens=64),
+    )
+    result = asyncio.run(OllamaProvider(request, transport).generate(assemble("test")))
+    assert captured == {
+        "path": "/api/chat",
+        "payload": {
+            "model": "llama3.2:latest",
+            "messages": [{"role": "user", "content": "test"}],
+            "stream": False,
+            "options": {"num_predict": 64, "temperature": 0.2, "top_p": 0.9, "seed": 7},
+        },
+        "timeout": 45.0,
+    }
+    assert result.raw_response == "Local answer"
+    assert result.resolved_model == "llama3.2:latest"
+    assert result.token_usage == {"input_tokens": 11, "output_tokens": 4, "total_tokens": 15}
+
+
+def test_ollama_endpoint_is_loopback_only(monkeypatch):
+    monkeypatch.setenv("OLLAMA_BASE_URL", "https://example.com:11434")
+    with pytest.raises(ValueError, match="loopback-only"):
+        ollama_base_url()
 
 
 def test_mock_is_deterministic(store):

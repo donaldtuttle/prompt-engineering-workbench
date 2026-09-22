@@ -105,7 +105,7 @@ class RunRequest(Schema):
     title: str = Field(default="Untitled experiment", min_length=1, max_length=120)
     probe_id: str = Field(default="manual-probe", min_length=1, max_length=120)
     artifact_id: str | None = "DEMO_OFFLINE_FIXTURE"
-    provider: Literal["mock", "openai"] = "mock"
+    provider: Literal["mock", "openai", "ollama"] = "mock"
     model: str = Field(default="fixture-echo-v2", min_length=1, max_length=160)
     delivery_mode: DeliveryMode = "SYSTEM_SLOT"
     replicates: int = Field(default=1, ge=1, le=4)
@@ -134,6 +134,8 @@ class RunRequest(Schema):
                 raise ValueError("Choose an explicit OpenAI model or snapshot ID")
             if self.sampling.seed is not None:
                 raise ValueError("This Responses adapter does not support seed; leave it null")
+        if self.provider == "ollama" and self.model.startswith("fixture-"):
+            raise ValueError("Choose an installed Ollama model")
         return self
 
 

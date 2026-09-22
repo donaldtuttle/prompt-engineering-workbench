@@ -1,6 +1,6 @@
 "use strict";
 const $ = id => document.getElementById(id);
-let artifacts = [], selectedRecord = null, activeId = null, pollTimer = null;
+let artifacts = [], providerCatalog = [], selectedRecord = null, activeId = null, pollTimer = null;
 const terminal = new Set(["COMPLETED", "PARTIAL", "FAILED", "INTERRUPTED"]);
 const example = "A study reports improved answers after adding a detailed instruction block.\n\nIdentify what the result supports, two alternative explanations, and one controlled follow-up test. Separate observations from speculation.";
 
@@ -160,16 +160,22 @@ for (const format of ["json", "jsonl"]) $("export-" + format).addEventListener("
 });
 function optionalNumber(id) { return $(id).value === "" ? null : Number($(id).value); }
 function providerChanged() {
-  const cloud = $("provider").value === "openai";
-  $("model").readOnly = !cloud; $("model").value = cloud ? "" : "fixture-echo-v2";
-  $("model").placeholder = cloud ? "Enter an exact model or snapshot ID" : "";
+  const selected = $("provider").value, cloud = selected === "openai", localModel = selected === "ollama";
+  const ollama = providerCatalog.find(p => p.id === "ollama"), models = ollama?.models || [];
+  $("model").readOnly = selected === "mock";
+  if (selected === "mock") $("model").value = "fixture-echo-v2";
+  else if (cloud) $("model").value = "";
+  else if (localModel && !models.includes($("model").value)) $("model").value = models[0] || "";
+  $("model").placeholder = cloud ? "Enter an exact model or snapshot ID" : localModel ? "Choose an installed Ollama model" : "";
   $("cloud-confirmation").hidden = !cloud; $("cloud-consent").checked = false;
   $("seed").disabled = cloud; if (cloud) $("seed").value = "";
-  $("mode-badge").textContent = cloud ? "● OPENAI CLOUD" : "● OFFLINE FIXTURE MODE";
-  $("charge-note").textContent = cloud ? "OpenAI API charges apply" : "No API keys · no API charges";
+  $("mode-badge").textContent = cloud ? "● OPENAI CLOUD" : localModel ? "● LOCAL OLLAMA" : "● OFFLINE FIXTURE MODE";
+  $("charge-note").textContent = cloud ? "OpenAI API charges apply" : localModel ? "Local model · no API key" : "No API keys · no API charges";
   $("mode-notice").textContent = cloud
     ? "The selected cloud provider receives every lane's probe and context. Evaluation is not performed."
-    : "Mock mode runs locally. Synthetic responses test the workbench; no language model is called.";
+    : localModel
+      ? "Ollama runs the selected model through a loopback-only local connection. Evaluation is not performed."
+      : "Mock mode runs locally. Synthetic responses test the workbench; no language model is called.";
 }
 $("provider").addEventListener("change", providerChanged);
 $("replay").addEventListener("click", async () => {
@@ -184,10 +190,15 @@ $("replay").addEventListener("click", async () => {
   } catch (error) { showError(error); $("replay").disabled = false; }
 });
 async function init() {
-  const providers = await api("/api/providers"), cloud = providers.find(p => p.id === "openai");
+  providerCatalog = await api("/api/providers");
+  const cloud = providerCatalog.find(p => p.id === "openai"), ollama = providerCatalog.find(p => p.id === "ollama");
   const option = $("provider").querySelector('[value="openai"]');
   option.disabled = !cloud?.enabled;
   option.textContent = cloud?.enabled ? "OpenAI · cloud API" : "OpenAI · enable on server";
+  const ollamaOption = $("provider").querySelector('[value="ollama"]');
+  ollamaOption.disabled = !ollama?.enabled;
+  ollamaOption.textContent = ollama?.enabled ? `Ollama · ${ollama.models.length} local model${ollama.models.length === 1 ? "" : "s"}` : "Ollama · local server unavailable";
+  $("model-options").replaceChildren(...(ollama?.models || []).map(model => { const item = node("option"); item.value = model; return item; }));
   providerChanged();
   artifacts = await api("/api/artifacts");
   for (const artifact of artifacts) {

@@ -6,6 +6,9 @@ import os
 from functools import lru_cache
 from importlib.metadata import version
 from typing import Protocol
+from urllib.error import HTTPError, URLError
+from urllib.parse import urlsplit
+from urllib.request import HTTPRedirectHandler, ProxyHandler, Request, build_opener
 
 from .models import Condition, ProviderResult, RunRequest
 
@@ -32,6 +35,65 @@ def provider_versions(provider):
 
 def cloud_available():
     return os.getenv("WORKBENCH_ENABLE_OPENAI") == "1" and bool(os.getenv("OPENAI_API_KEY"))
+
+
+def ollama_base_url():
+    value = os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434").rstrip("/")
+    parsed = urlsplit(value)
+    if (
+        parsed.scheme != "http"
+        or parsed.hostname not in {"127.0.0.1", "localhost", "::1"}
+        or parsed.username
+        or parsed.password
+        or parsed.query
+        or parsed.fragment
+        or parsed.path not in ("", "/")
+    ):
+        raise ValueError("OLLAMA_BASE_URL must be a loopback-only HTTP origin")
+    return value
+
+
+class _NoRedirect(HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
+def _ollama_json(path, payload=None, timeout=2.0):
+    body = None if payload is None else json.dumps(payload).encode("utf-8")
+    request = Request(
+        f"{ollama_base_url()}{path}",
+        data=body,
+        headers={"Content-Type": "application/json"} if body is not None else {},
+        method="POST" if body is not None else "GET",
+    )
+    try:
+        # Ignore ambient proxy settings and refuse redirects so a local service cannot
+        # bounce prompts to a non-loopback endpoint.
+        opener = build_opener(ProxyHandler({}), _NoRedirect())
+        with opener.open(request, timeout=timeout) as response:
+            result = json.load(response)
+    except (HTTPError, URLError, OSError, TimeoutError, json.JSONDecodeError) as exc:
+        raise RuntimeError("Local Ollama request failed") from exc
+    if not isinstance(result, dict):
+        raise ValueError("Ollama returned a non-object response")
+    return result
+
+
+def ollama_models():
+    try:
+        response = _ollama_json("/api/tags", timeout=1.0)
+    except (RuntimeError, ValueError):
+        return []
+    models = response.get("models")
+    if not isinstance(models, list):
+        return []
+    return sorted(
+        {
+            item.get("name")
+            for item in models
+            if isinstance(item, dict) and isinstance(item.get("name"), str)
+        }
+    )
 
 
 class MockProvider:
@@ -148,5 +210,51 @@ class OpenAIProvider:
 
 
 class OllamaProvider:
+    """Loopback-only Ollama chat adapter; no API key or cloud endpoint."""
+
+    def __init__(self, request=None, transport=None):
+        self.request = request or RunRequest(
+            task="fixture", provider="ollama", model="llama3.2:latest"
+        )
+        self.transport = transport or _ollama_json
+
     async def generate(self, condition: Condition) -> ProviderResult:
-        raise NotImplementedError("Ollama is not implemented in v0.2.0")
+        sampling = self.request.sampling
+        options = {"num_predict": sampling.max_output_tokens}
+        for name, value in (
+            ("temperature", sampling.temperature),
+            ("top_p", sampling.top_p),
+            ("seed", sampling.seed),
+        ):
+            if value is not None:
+                options[name] = value
+        payload = {
+            "model": self.request.model,
+            "messages": [message.model_dump() for message in condition.messages],
+            "stream": False,
+            "options": options,
+        }
+        response = await asyncio.to_thread(
+            self.transport, "/api/chat", payload, self.request.timeout_seconds
+        )
+        message = response.get("message")
+        if not isinstance(message, dict) or not isinstance(message.get("content"), str):
+            raise ValueError("Ollama response lacks assistant message content")
+        if response.get("done") is not True:
+            raise ValueError("Ollama response is incomplete")
+        counts = {}
+        if type(response.get("prompt_eval_count")) is int:
+            counts["input_tokens"] = response["prompt_eval_count"]
+        if type(response.get("eval_count")) is int:
+            counts["output_tokens"] = response["eval_count"]
+        if "input_tokens" in counts and "output_tokens" in counts:
+            counts["total_tokens"] = counts["input_tokens"] + counts["output_tokens"]
+        return ProviderResult(
+            raw_response=message["content"],
+            structured_response=response,
+            token_usage=counts or None,
+            resolved_model=response.get("model")
+            if isinstance(response.get("model"), str)
+            else None,
+            response_status="completed",
+        )

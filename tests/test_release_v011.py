@@ -159,11 +159,11 @@ def test_no_artifact_name_specific_validation():
 
 def test_release_version_and_declared_dependency():
     project = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]
-    assert project["version"] == __version__ == "0.2.0"
+    assert project["version"] == __version__ == "0.2.1"
     assert "pydantic>=2.13.5,<3" in project["dependencies"]
     lock = tomllib.loads((ROOT / "uv.lock").read_text())
     app = next(p for p in lock["package"] if p["name"] == project["name"])
-    assert app["version"] == "0.2.0"
+    assert app["version"] == "0.2.1"
     assert {"name": "pydantic"} in app["dependencies"]
 
 
@@ -197,7 +197,7 @@ def test_upgrade_preserves_legacy_records_and_raw_payload(tmp_path, fixture):
         Repository(path)
     migrate(path)
     with TestClient(create_app(path, test_mode=True)) as client:
-        assert client.get("/health").json()["version"] == "0.2.0"
+        assert client.get("/health").json()["version"] == "0.2.1"
         url = f"/api/experiments/{legacy['experiment_id']}"
         assert client.get(url).json() == legacy
         assert client.get(url + "/export").json()["experiment"] == legacy

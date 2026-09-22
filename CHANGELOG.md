@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.1 — 2026-09-22
+
+- Added a loopback-only Ollama chat adapter with installed-model discovery, sampling controls,
+  provider token counts, browser selection, and no API-key requirement.
+- Verified real local inference with llama3.1:8b and llama3.2:latest, including a complete
+  baseline/injector/neutral-control run through llama3.2:latest.
+
 ## 0.2.0 — 2026-09-19
 
 Complete experimental-control and adapter release. Status DEVELOP; live OpenAI smoke unverified.

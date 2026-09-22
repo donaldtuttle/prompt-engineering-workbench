@@ -6,7 +6,14 @@ from time import perf_counter
 from .artifacts import ArtifactStore, digest
 from .conditions import assemble, verify_condition, with_messages
 from .models import CallRecord, Experiment, Message, Run, RunRequest, now
-from .providers import MockProvider, OpenAIProvider, cloud_available, provider_versions
+from .providers import (
+    MockProvider,
+    OllamaProvider,
+    OpenAIProvider,
+    cloud_available,
+    ollama_models,
+    provider_versions,
+)
 from .repository import Repository
 
 
@@ -19,7 +26,10 @@ def configuration_hash(run):
         "replicate_index": run.replicate_index,
         "provider_versions": run.provider_versions,
         "execution_settings": run.execution_settings,
-        "api_mode": ("responses" if run.provider == "openai" else "fixture"),
+        "api_mode": {
+            "openai": "responses",
+            "ollama": "ollama-chat",
+        }.get(run.provider, "fixture"),
         "tracing": False,
         "tools": [],
         "store": False,
@@ -43,7 +53,7 @@ class Controller:
         exp = Experiment(
             request=request, task_sha256=digest(request.task.encode()), artifact=snapshot
         )
-        if request.provider == "openai":
+        if request.provider in ("openai", "ollama"):
             exp.evidence_scope = "UNBLINDED_MODEL_OUTPUT; evaluation not performed"
         kinds = (
             ["BASELINE", "FULL_INJECTOR", "NEUTRAL_LENGTH_CONTROL"] if snapshot else ["BASELINE"]
@@ -65,7 +75,7 @@ class Controller:
                         "concurrency": request.concurrency,
                     },
                     provider_versions=provider_versions(request.provider),
-                    seed_supported=request.provider == "mock",
+                    seed_supported=request.provider in ("mock", "ollama"),
                     execution="cloud" if request.provider == "openai" else "local-offline",
                 )
                 run.configuration_hash = configuration_hash(run)
@@ -88,6 +98,10 @@ class Controller:
     async def create(self, request, replay_id=None):
         if request.provider == "openai" and not cloud_available():
             raise ValueError("OpenAI is disabled or its server-side key is missing")
+        if request.provider == "ollama" and request.model not in await asyncio.to_thread(
+            ollama_models
+        ):
+            raise ValueError("Selected Ollama model is unavailable on the local server")
         await self._admit()
         owner = asyncio.current_task()
         self.creations.add(owner)
@@ -227,11 +241,10 @@ class Controller:
 
         exp.status = "RUNNING"
         local_limit = asyncio.Semaphore(exp.request.concurrency)
-        provider = self.provider or (
-            OpenAIProvider(exp.request)
-            if exp.request.provider == "openai"
-            else MockProvider(exp.request)
-        )
+        provider = self.provider or {
+            "openai": OpenAIProvider,
+            "ollama": OllamaProvider,
+        }.get(exp.request.provider, MockProvider)(exp.request)
 
         async def call(run, condition, phase):
             record = CallRecord(

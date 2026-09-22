@@ -1,11 +1,12 @@
-# Prompt Engineering Workbench — v0.2.0
+# Prompt Engineering Workbench — v0.2.1
 
 A local browser application for running the same probe under isolated baseline,
 injector, and length-control conditions, preserving the inputs, and reviewing saved runs.
 
 **Status: DEVELOP.** Offline workflows and the real OpenAI Agents SDK through a mock
-HTTP transport are verified. A real OpenAI model has not been called for this release.
-Live-account compatibility, model availability, and injector effectiveness remain unverified.
+HTTP transport are verified. Local Ollama execution has been verified with llama3.1:8b and
+llama3.2:latest. A real OpenAI model has not been called for this release; live-account
+compatibility and injector effectiveness remain unverified.
 
 This is a complete source release. Existing users: read [UPGRADE.md](UPGRADE.md) first.
 
@@ -35,6 +36,13 @@ including control construction: tokenizer data is bundled and hash checked.
 Load the example, keep **Mock**, choose an artifact, and click **Run experiment**.
 A valid artifact creates three lanes per replicate. No artifact creates baseline only.
 An invalid artifact blocks both context-dependent lanes while baseline can still run.
+
+## New in v0.2.1
+
+- Loopback-only Ollama model discovery and chat execution with no API key.
+- Browser selection of installed Ollama models and local-execution labeling.
+- Ollama temperature, top-p, seed, output-token controls, and provider token-count capture.
+- Proxy and redirect bypass prevention for the local Ollama transport.
 
 ## New in v0.2.0
 
@@ -96,6 +104,23 @@ provider-reported usage where present. A returned alias is not proof of an immut
 snapshot. Cost and trace ID remain null. Errors retain exception type, not raw exception text.
 See [provider implementation notes and official references](docs/OPENAI_ADAPTER.md).
 
+## Local Ollama execution
+
+Ollama needs no API key. Start Ollama on its default loopback address, install at least one model,
+then start the workbench normally. The provider menu discovers installed models from
+`http://127.0.0.1:11434` and sends chat requests only over loopback. `OLLAMA_BASE_URL` may select a
+different loopback HTTP port; remote hosts and authenticated URLs are rejected.
+
+```sh
+ollama list
+uv run --locked python -m workbench
+```
+
+Choose **Ollama**, select an installed model such as `llama3.2:latest`, and run the experiment.
+Temperature, top-p, seed, and maximum output tokens are forwarded as Ollama runtime options.
+Provider-reported prompt/output token counts are stored; cost remains null. Prompts, responses,
+and the SQLite history remain plaintext on the local computer.
+
 ## Reading results
 
 Each lane shows its condition, replicate, provider, status, requested/returned model,
@@ -139,7 +164,7 @@ No paid model call is part of the test suite or browser smoke script.
   per experiment. Timeouts cover a whole lane attempt, including both handshake/task phases.
 - Full experiment payloads are still saved on transitions. Artifact deduplication/per-run
   storage (D4) remains required before ablation matrices.
-- No blind audit, score aggregation, provider streaming UI, Ollama adapter, or efficacy claim.
+- No blind audit, score aggregation, provider streaming UI, or efficacy claim.
 - Windows/macOS and browsers other than the tested Linux Chromium run remain unverified.
 
 Project architecture remains FastAPI → controller → provider boundary → SQLite → JSON/JSONL,

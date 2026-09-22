@@ -1,4 +1,4 @@
-# Product workflow — v0.2.0
+# Product workflow — v0.2.1
 
 1. Start the server locally and open http://127.0.0.1:8765 on the same computer.
 2. Enter a probe, title, and probe ID. Text is preserved as submitted. Browser textarea newline
@@ -6,8 +6,9 @@
 3. Select a local artifact and inspect its integrity status, byte count, and hash.
 4. Choose delivery mode and 1–4 replicates. A valid artifact creates three conditions per replicate.
    No artifact creates baseline only. Invalid context blocks injector and control lanes.
-5. Keep Mock for offline work. OpenAI appears available only when enabled on the server with a key.
-   Selecting it requires an explicit model string and cloud consent; the UI states that charges apply.
+5. Keep Mock for fixture-only work. Ollama appears when a loopback server has installed models and
+   needs no API key. OpenAI appears only when enabled on the server with a key; selecting it requires
+   an explicit model string and cloud consent, and the UI states that charges apply.
 6. Set sampling controls, timeout, retries, and concurrency. Blank sampling values are omitted.
    Handshake mode adds a call to every lane. The preview shows calls before retries.
 7. Run. Inspect independent raw outputs, phase timing, model strings, statuses, and final prompt hashes.

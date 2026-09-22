@@ -13,7 +13,7 @@
     <button class="nav-item active" id="new-experiment"><span>+</span> New experiment</button>
     <div class="history-heading"><span>EXPERIMENT HISTORY</span><button id="refresh-history" title="Refresh history" aria-label="Refresh history">↻</button></div>
     <div id="history" class="history"><p class="muted">Your saved runs will appear here.</p></div>
-    <div class="sidebar-bottom"><span class="status-dot"></span> Local workspace · explicit cloud choice<small>v0.2.0 · DEVELOP · Controlled runs</small></div>
+    <div class="sidebar-bottom"><span class="status-dot"></span> Local workspace · explicit cloud choice<small>v0.2.1 · DEVELOP · Controlled runs</small></div>
   </aside>
   <main>
     <header class="topbar"><span>LAB / <strong>EXPERIMENTS</strong></span><span class="badge offline" id="mode-badge">● OFFLINE FIXTURE MODE</span></header>
@@ -39,13 +39,13 @@
         </div>
         <section class="panel run-panel">
           <div class="section-heading"><h2><span class="step">03</span> Run configuration</h2><span class="muted small">Independent lanes · no shared conversation</span></div>
-          <div class="config-grid"><div class="provider-field"><label for="provider">Provider / model</label><select id="provider"><option value="mock">Mock · fixture-echo-v2 (local)</option><option value="openai" disabled>OpenAI · loading availability</option><option disabled>Ollama — planned, unavailable</option></select></div><div><label for="concurrency">Lane limit</label><select id="concurrency"><option>1</option><option selected>2</option><option>3</option><option>4</option></select></div><div><label for="timeout">Timeout (s)</label><input id="timeout" type="number" min="1" max="300" value="30" required></div><div><label for="retries">Retries</label><select id="retries"><option>0</option><option>1</option><option>2</option></select></div></div>
+          <div class="config-grid"><div class="provider-field"><label for="provider">Provider / model</label><select id="provider"><option value="mock">Mock · fixture-echo-v2 (local)</option><option value="openai" disabled>OpenAI · loading availability</option><option value="ollama" disabled>Ollama · loading local models</option></select></div><div><label for="concurrency">Lane limit</label><select id="concurrency"><option>1</option><option selected>2</option><option>3</option><option>4</option></select></div><div><label for="timeout">Timeout (s)</label><input id="timeout" type="number" min="1" max="300" value="30" required></div><div><label for="retries">Retries</label><select id="retries"><option>0</option><option>1</option><option>2</option></select></div></div>
           <div class="config-grid advanced-config">
             <div><label for="delivery">Delivery mode</label><select id="delivery"><option>SYSTEM_SLOT</option><option>USER_PASTE</option><option>USER_PASTE_WITH_HANDSHAKE</option></select></div>
             <div><label for="replicates">Replicates</label><input id="replicates" type="number" min="1" max="4" value="1" required></div>
             <div><label for="temperature">Temperature (blank = default)</label><input id="temperature" type="number" min="0" max="2" step="0.1"></div>
-            <div><label for="seed">Seed (mock only)</label><input id="seed" type="number" min="0" max="2147483647"></div>
-            <div><label for="model">Requested model / snapshot</label><input id="model" value="fixture-echo-v2" maxlength="160" required readonly></div>
+            <div><label for="seed">Seed (Mock/Ollama)</label><input id="seed" type="number" min="0" max="2147483647"></div>
+            <div><label for="model">Requested model / snapshot</label><input id="model" list="model-options" value="fixture-echo-v2" maxlength="160" required readonly><datalist id="model-options"></datalist></div>
             <div><label for="top-p">Top P (blank = default)</label><input id="top-p" type="number" min="0.01" max="1" step="0.01"></div>
             <div><label for="max-tokens">Max output tokens / call</label><input id="max-tokens" type="number" min="16" max="8192" value="512" required></div>
           </div>
@@ -61,7 +61,7 @@
         <div id="audit-note" class="audit-note" hidden>Evaluation: not performed · Outcome: INSUFFICIENT_EVIDENCE · Unblinded impressions are not scored evidence.</div>
         <details id="input-snapshot" class="panel snapshot" hidden><summary>Inspect stored probe &amp; input identities</summary><div id="snapshot-content"></div></details>
       </section>
-      <footer><span>LOCAL-FIRST / EXACT INPUTS / AUDITABLE RECORDS</span><span>Prompt Engineering Workbench · 0.2.0</span></footer>
+      <footer><span>LOCAL-FIRST / EXACT INPUTS / AUDITABLE RECORDS</span><span>Prompt Engineering Workbench · 0.2.1</span></footer>
     </div>
   </main>
 </body>

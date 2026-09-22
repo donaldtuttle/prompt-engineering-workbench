@@ -16,7 +16,7 @@ from .controller import Controller
 from .legacy_models import Experiment as LegacyExperiment
 from .legacy_models import ExportRecord as LegacyExportRecord
 from .models import ExportRecord, ReplayRequest, RunRequest
-from .providers import cloud_available
+from .providers import cloud_available, ollama_models
 from .repository import Repository
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -135,6 +135,7 @@ def create_app(
 
     @app.get("/api/providers")
     def providers():
+        local_models = [] if test_mode else ollama_models()
         return [
             {
                 "id": "mock",
@@ -151,8 +152,15 @@ def create_app(
             },
             {
                 "id": "ollama",
-                "enabled": False,
-                "reason": "Not implemented; no local model requests",
+                "enabled": bool(local_models),
+                "execution": "local-offline",
+                "models": local_models,
+                "reason": (
+                    None
+                    if local_models
+                    else "No loopback Ollama server or installed models detected"
+                ),
+                "seed_supported": True,
             },
         ]
 
@@ -182,7 +190,7 @@ def create_app(
             exp = await app.state.controller.create(request)
         except (ValueError, OSError) as exc:
             raise HTTPException(
-                400, "Input unavailable, integrity preparation failed, or cloud provider disabled"
+                400, "Input unavailable, integrity preparation failed, or provider unavailable"
             ) from exc
         except RuntimeError as exc:
             raise HTTPException(429, str(exc)) from exc

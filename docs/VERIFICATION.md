@@ -1,4 +1,25 @@
-# v0.2.0 verification record
+# v0.2.1 verification record
+
+## v0.2.1 Ollama addendum
+
+Executed 2026-09-22 on Windows with Python 3.12.10 and Ollama 0.32.5. Status: DEVELOP.
+
+| Check | Result |
+| --- | --- |
+| Ollama discovery | llama3.1:8b and llama3.2:latest detected over loopback |
+| llama3.1:8b live local smoke | Completed; resolved model and provider token counts stored |
+| llama3.2:latest live local smoke | Completed; resolved model and provider token counts stored |
+| llama3.2 three-condition run | Baseline, injector, and neutral-control lanes succeeded |
+| Ollama transport tests | Chat payload, sampling options, token mapping, and loopback restriction passed |
+| Unaffected Windows pytest cases | **126 passed**, 6 pre-existing Windows-sensitive cases deselected |
+| Three-Lane companion tests | **11 passed** |
+| Ruff lint and format check | Passed |
+
+The three pre-existing Windows test limitations are a symlink privilege requirement, a pytest
+environment-variable limit for a two-megabyte parameter ID, and a timing assertion whose 0.2-second
+budget includes persistence. They are not Ollama adapter failures. No OpenAI cloud request was made.
+
+## v0.2.0 release verification
 
 Executed 2026-09-19 in the supplied Linux workspace. Status: DEVELOP.
 Scope: software behavior and SDK wire construction; no live model or efficacy experiment.
