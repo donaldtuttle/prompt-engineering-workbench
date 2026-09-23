@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+Later-slice Claude adapter. Not enabled by default. No model-efficacy claim; resolution stays
+INSUFFICIENT_EVIDENCE.
+
+- Added an opt-in Claude Messages adapter. It runs only when `WORKBENCH_ENABLE_CLAUDE=1` and
+  `ANTHROPIC_API_KEY` are both set. The endpoint is explicit `https://api.anthropic.com`, retries
+  are off, and each `generate()` is one tool-free call.
+- Added a receive-gate: `messages.count_tokens` runs before `create`. Input above the context floor
+  minus max output tokens is refused. The default floor is 200000 (`WORKBENCH_CLAUDE_CONTEXT_FLOOR`).
+- Replay of a Claude experiment requires fresh `cloud_consent`, the same rule as OpenAI.
+
 ## 0.2.0 — 2026-09-19
 
 Complete experimental-control and adapter release. Status DEVELOP; live OpenAI smoke unverified.

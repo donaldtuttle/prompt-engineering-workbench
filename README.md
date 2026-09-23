@@ -96,6 +96,23 @@ provider-reported usage where present. A returned alias is not proof of an immut
 snapshot. Cost and trace ID remain null. Errors retain exception type, not raw exception text.
 See [provider implementation notes and official references](docs/OPENAI_ADAPTER.md).
 
+## Optional Claude execution
+
+Claude is a later slice, not a default. Mock stays the default. Set **both** variables in the
+server environment. `ANTHROPIC_BASE_URL` is ignored; the adapter calls `https://api.anthropic.com`.
+
+| Variable | Meaning |
+| --- | --- |
+| `WORKBENCH_ENABLE_CLAUDE` | Set to `1` to allow the Claude adapter |
+| `ANTHROPIC_API_KEY` | Server-side credential; never enter it into the probe or the browser |
+| `WORKBENCH_CLAUDE_CONTEXT_FLOOR` | Optional input budget ceiling; default `200000` |
+
+Choose **Claude**, enter an explicit model ID, and check the cloud consent box. The adapter
+counts tokens before the Messages call and refuses input that would exceed the floor minus
+the requested max output tokens. `end_turn` and `stop_sequence` are recorded as completed.
+`max_tokens` and every other stop reason are not. This does not score model quality.
+Resolution stays INSUFFICIENT_EVIDENCE.
+
 ## Reading results
 
 Each lane shows its condition, replicate, provider, status, requested/returned model,
