@@ -410,7 +410,7 @@ def test_unknown_records_and_export_type(client):
 
 def test_providers_disabled_without_keys(client):
     providers = client.get("/api/providers").json()
-    assert [p["enabled"] for p in providers] == [True, False, False]
+    assert [p["enabled"] for p in providers] == [True, False, False, False]
     with pytest.raises(NotImplementedError):
         asyncio.run(OllamaProvider().generate(assemble("test")))
     request = RunRequest(task="test", provider="openai", model="test-model", cloud_consent=True)

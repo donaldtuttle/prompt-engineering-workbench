@@ -16,7 +16,7 @@ from .controller import Controller
 from .legacy_models import Experiment as LegacyExperiment
 from .legacy_models import ExportRecord as LegacyExportRecord
 from .models import ExportRecord, ReplayRequest, RunRequest
-from .providers import cloud_available
+from .providers import any_cloud_available, provider_catalog
 from .repository import Repository
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -129,32 +129,13 @@ def create_app(
         return {
             "status": "ok",
             "version": __version__,
-            "mode": "cloud-enabled" if cloud_available() else "offline",
+            "mode": "cloud-enabled" if any_cloud_available() else "offline",
             "database": "ok",
         }
 
     @app.get("/api/providers")
     def providers():
-        return [
-            {
-                "id": "mock",
-                "model": "fixture-echo-v2",
-                "enabled": True,
-                "execution": "local-offline",
-            },
-            {
-                "id": "openai",
-                "enabled": cloud_available(),
-                "execution": "cloud",
-                "reason": "Requires WORKBENCH_ENABLE_OPENAI=1 and server-side OPENAI_API_KEY",
-                "seed_supported": False,
-            },
-            {
-                "id": "ollama",
-                "enabled": False,
-                "reason": "Not implemented; no local model requests",
-            },
-        ]
+        return provider_catalog()
 
     @app.get("/api/artifacts")
     def artifacts():
@@ -202,6 +183,10 @@ def create_app(
         if exp.request.provider == "openai" and not options.cloud_consent:
             raise HTTPException(
                 400, "Replay sends stored prompts to OpenAI; cloud_consent required"
+            )
+        if exp.request.provider == "claude" and not options.cloud_consent:
+            raise HTTPException(
+                400, "Replay sends stored prompts to Claude; cloud_consent required"
             )
         try:
             replayed = await app.state.controller.create(exp.request, replay_id=experiment_id)

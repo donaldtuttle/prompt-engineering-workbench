@@ -39,7 +39,7 @@
         </div>
         <section class="panel run-panel">
           <div class="section-heading"><h2><span class="step">03</span> Run configuration</h2><span class="muted small">Independent lanes · no shared conversation</span></div>
-          <div class="config-grid"><div class="provider-field"><label for="provider">Provider / model</label><select id="provider"><option value="mock">Mock · fixture-echo-v2 (local)</option><option value="openai" disabled>OpenAI · loading availability</option><option disabled>Ollama — planned, unavailable</option></select></div><div><label for="concurrency">Lane limit</label><select id="concurrency"><option>1</option><option selected>2</option><option>3</option><option>4</option></select></div><div><label for="timeout">Timeout (s)</label><input id="timeout" type="number" min="1" max="300" value="30" required></div><div><label for="retries">Retries</label><select id="retries"><option>0</option><option>1</option><option>2</option></select></div></div>
+          <div class="config-grid"><div class="provider-field"><label for="provider">Provider / model</label><select id="provider"><option value="mock">Mock · fixture-echo-v2 (local)</option></select></div><div><label for="concurrency">Lane limit</label><select id="concurrency"><option>1</option><option selected>2</option><option>3</option><option>4</option></select></div><div><label for="timeout">Timeout (s)</label><input id="timeout" type="number" min="1" max="300" value="30" required></div><div><label for="retries">Retries</label><select id="retries"><option>0</option><option>1</option><option>2</option></select></div></div>
           <div class="config-grid advanced-config">
             <div><label for="delivery">Delivery mode</label><select id="delivery"><option>SYSTEM_SLOT</option><option>USER_PASTE</option><option>USER_PASTE_WITH_HANDSHAKE</option></select></div>
             <div><label for="replicates">Replicates</label><input id="replicates" type="number" min="1" max="4" value="1" required></div>
@@ -49,7 +49,7 @@
             <div><label for="top-p">Top P (blank = default)</label><input id="top-p" type="number" min="0.01" max="1" step="0.01"></div>
             <div><label for="max-tokens">Max output tokens / call</label><input id="max-tokens" type="number" min="16" max="8192" value="512" required></div>
           </div>
-          <label id="cloud-confirmation" class="cloud-confirmation" hidden><input type="checkbox" id="cloud-consent"> Send this probe and its context to OpenAI. API charges apply, including handshake calls and retries.</label>
+          <label id="cloud-confirmation" class="cloud-confirmation" hidden><input type="checkbox" id="cloud-consent"> <span id="cloud-consent-label">Send this probe and its context to the selected cloud provider. API charges apply, including handshake calls and retries.</span></label>
           <p class="muted small">Neutral control matches context tokens in the bundled o200k_base tokenizer. A repeated word is a comparison input; semantic neutrality is not established. Handshake mode adds a preparation call to every lane.</p>
           <div class="run-bottom"><div class="lane-preview" id="lane-preview">Baseline + Injector + Neutral control</div><div class="run-action"><span id="charge-note">No API keys · no API charges</span><button type="submit" id="run-button" class="primary">Run experiment <span>↗</span></button></div></div>
         </section>

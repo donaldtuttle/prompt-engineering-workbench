@@ -1,7 +1,9 @@
 "use strict";
 const $ = id => document.getElementById(id);
-let artifacts = [], selectedRecord = null, activeId = null, pollTimer = null;
+let artifacts = [], providerCatalog = [], selectedRecord = null, activeId = null, pollTimer = null;
 const terminal = new Set(["COMPLETED", "PARTIAL", "FAILED", "INTERRUPTED"]);
+const CLOUD_PROVIDERS = new Set(["openai", "claude"]);
+const PROVIDER_LABEL = {openai: "OpenAI", claude: "Claude", ollama: "Ollama"};
 const example = "A study reports improved answers after adding a detailed instruction block.\n\nIdentify what the result supports, two alternative explanations, and one controlled follow-up test. Separate observations from speculation.";
 
 function node(tag, text, className) {
@@ -116,6 +118,15 @@ async function openRecord(id) {
 }
 $("experiment-form").addEventListener("submit", async event => {
   event.preventDefault(); $("error").hidden = true;
+  const selected = providerCatalog.find(p => p.id === $("provider").value);
+  if ($("provider").value !== "mock" && !selected?.enabled) {
+    showError(new Error(selected?.reason || "Provider is disabled"));
+    return;
+  }
+  if (CLOUD_PROVIDERS.has($("provider").value) && !$("cloud-consent").checked) {
+    showError(new Error("Cloud runs require the confirmation checkbox"));
+    return;
+  }
   const button = $("run-button"); button.disabled = true; button.textContent = "Creating experiment…";
   try {
     const result = await api("/api/experiments", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({
@@ -160,22 +171,55 @@ for (const format of ["json", "jsonl"]) $("export-" + format).addEventListener("
 });
 function optionalNumber(id) { return $(id).value === "" ? null : Number($(id).value); }
 function providerChanged() {
-  const cloud = $("provider").value === "openai";
-  $("model").readOnly = !cloud; $("model").value = cloud ? "" : "fixture-echo-v2";
+  const id = $("provider").value;
+  const entry = providerCatalog.find(p => p.id === id);
+  const cloud = CLOUD_PROVIDERS.has(id);
+  const name = PROVIDER_LABEL[id] || id;
+  $("model").readOnly = !cloud;
+  if (!cloud) $("model").value = "fixture-echo-v2";
+  else if ($("model").value.startsWith("fixture-")) $("model").value = "";
   $("model").placeholder = cloud ? "Enter an exact model or snapshot ID" : "";
-  $("cloud-confirmation").hidden = !cloud; $("cloud-consent").checked = false;
-  $("seed").disabled = cloud; if (cloud) $("seed").value = "";
-  $("mode-badge").textContent = cloud ? "● OPENAI CLOUD" : "● OFFLINE FIXTURE MODE";
-  $("charge-note").textContent = cloud ? "OpenAI API charges apply" : "No API keys · no API charges";
+  $("cloud-confirmation").hidden = !cloud;
+  $("cloud-consent").required = cloud;
+  $("cloud-consent").checked = false;
+  $("cloud-consent-label").textContent = `Send this probe and its context to ${name}. API charges apply, including handshake calls and retries.`;
+  $("seed").disabled = cloud;
+  if (cloud) $("seed").value = "";
+  $("mode-badge").textContent = cloud ? `● ${name.toUpperCase()} CLOUD` : "● OFFLINE FIXTURE MODE";
+  $("charge-note").textContent = cloud ? `${name} API charges apply` : "No API keys · no API charges";
   $("mode-notice").textContent = cloud
     ? "The selected cloud provider receives every lane's probe and context. Evaluation is not performed."
     : "Mock mode runs locally. Synthetic responses test the workbench; no language model is called.";
+  $("run-button").disabled = id !== "mock" && !entry?.enabled;
+}
+function providerOptionLabel(entry) {
+  const name = PROVIDER_LABEL[entry.id] || entry.id;
+  if (entry.enabled) return CLOUD_PROVIDERS.has(entry.id) ? `${name} · cloud API` : `${name} · available`;
+  return `${name} · ${entry.reason || "unavailable"}`;
+}
+function renderProviders(providers) {
+  providerCatalog = providers;
+  const select = $("provider");
+  const current = select.value;
+  for (const option of [...select.options]) if (option.value !== "mock") option.remove();
+  for (const entry of providers) {
+    if (entry.id === "mock") continue;
+    const option = node("option", providerOptionLabel(entry));
+    option.value = entry.id;
+    option.disabled = entry.enabled !== true;
+    if (entry.reason) option.title = entry.reason;
+    select.append(option);
+  }
+  const chosen = [...select.options].find(option => option.value === current && !option.disabled);
+  select.value = chosen ? current : "mock";
 }
 $("provider").addEventListener("change", providerChanged);
 $("replay").addEventListener("click", async () => {
   if (!selectedRecord) return;
-  const cloud = selectedRecord.request.provider === "openai";
-  if (cloud && !window.confirm("Replay the stored prompts through OpenAI? API charges apply.")) return;
+  const providerId = selectedRecord.request.provider;
+  const cloud = CLOUD_PROVIDERS.has(providerId);
+  const name = PROVIDER_LABEL[providerId] || providerId;
+  if (cloud && !window.confirm(`Replay the stored prompts through ${name}? API charges apply.`)) return;
   $("replay").disabled = true;
   try {
     const result = await api(`/api/experiments/${encodeURIComponent(selectedRecord.experiment_id)}/replay`, {
@@ -184,10 +228,7 @@ $("replay").addEventListener("click", async () => {
   } catch (error) { showError(error); $("replay").disabled = false; }
 });
 async function init() {
-  const providers = await api("/api/providers"), cloud = providers.find(p => p.id === "openai");
-  const option = $("provider").querySelector('[value="openai"]');
-  option.disabled = !cloud?.enabled;
-  option.textContent = cloud?.enabled ? "OpenAI · cloud API" : "OpenAI · enable on server";
+  renderProviders(await api("/api/providers"));
   providerChanged();
   artifacts = await api("/api/artifacts");
   for (const artifact of artifacts) {

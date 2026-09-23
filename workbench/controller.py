@@ -5,8 +5,15 @@ from time import perf_counter
 
 from .artifacts import ArtifactStore, digest
 from .conditions import assemble, verify_condition, with_messages
-from .models import CallRecord, Experiment, Message, Run, RunRequest, now
-from .providers import MockProvider, OpenAIProvider, cloud_available, provider_versions
+from .models import CallRecord, Experiment, Message, ProviderResult, Run, RunRequest, now
+from .providers import (
+    ClaudeProvider,
+    MockProvider,
+    OpenAIProvider,
+    claude_available,
+    cloud_available,
+    provider_versions,
+)
 from .repository import Repository
 
 
@@ -19,12 +26,20 @@ def configuration_hash(run):
         "replicate_index": run.replicate_index,
         "provider_versions": run.provider_versions,
         "execution_settings": run.execution_settings,
-        "api_mode": ("responses" if run.provider == "openai" else "fixture"),
+        "api_mode": {"openai": "responses", "claude": "messages"}.get(run.provider, "fixture"),
         "tracing": False,
         "tools": [],
         "store": False,
     }
     return digest(json.dumps(config, sort_keys=True, separators=(",", ":")).encode())
+
+
+def _default_provider(request):
+    if request.provider == "openai":
+        return OpenAIProvider(request)
+    if request.provider == "claude":
+        return ClaudeProvider(request)
+    return MockProvider(request)
 
 
 class Controller:
@@ -43,7 +58,7 @@ class Controller:
         exp = Experiment(
             request=request, task_sha256=digest(request.task.encode()), artifact=snapshot
         )
-        if request.provider == "openai":
+        if request.provider in ("openai", "claude"):
             exp.evidence_scope = "UNBLINDED_MODEL_OUTPUT; evaluation not performed"
         kinds = (
             ["BASELINE", "FULL_INJECTOR", "NEUTRAL_LENGTH_CONTROL"] if snapshot else ["BASELINE"]
@@ -66,7 +81,9 @@ class Controller:
                     },
                     provider_versions=provider_versions(request.provider),
                     seed_supported=request.provider == "mock",
-                    execution="cloud" if request.provider == "openai" else "local-offline",
+                    execution=(
+                        "cloud" if request.provider in ("openai", "claude") else "local-offline"
+                    ),
                 )
                 run.configuration_hash = configuration_hash(run)
                 if snapshot and kind != "BASELINE" and snapshot.identity.status != "VALID":
@@ -88,6 +105,8 @@ class Controller:
     async def create(self, request, replay_id=None):
         if request.provider == "openai" and not cloud_available():
             raise ValueError("OpenAI is disabled or its server-side key is missing")
+        if request.provider == "claude" and not claude_available():
+            raise ValueError("Claude is disabled or its server-side key is missing")
         await self._admit()
         owner = asyncio.current_task()
         self.creations.add(owner)
@@ -227,11 +246,7 @@ class Controller:
 
         exp.status = "RUNNING"
         local_limit = asyncio.Semaphore(exp.request.concurrency)
-        provider = self.provider or (
-            OpenAIProvider(exp.request)
-            if exp.request.provider == "openai"
-            else MockProvider(exp.request)
-        )
+        provider = self.provider or _default_provider(exp.request)
 
         async def call(run, condition, phase):
             record = CallRecord(
@@ -247,6 +262,12 @@ class Controller:
                 return record.result
             except BaseException as exc:
                 record.error_type = type(exc).__name__
+                gate = getattr(exc, "receive_gate", None)
+                if isinstance(gate, dict) and record.result is None:
+                    record.result = ProviderResult(
+                        raw_response="",
+                        structured_response={"receive_gate": gate},
+                    )
                 raise
             finally:
                 record.ended_at = now()
