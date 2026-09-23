@@ -10,7 +10,7 @@ from workbench.app import ROOT, create_app
 from workbench.artifacts import ArtifactStore, digest
 from workbench.controller import Controller, assemble
 from workbench.models import RunRequest
-from workbench.providers import MockProvider, OllamaProvider, OpenAIProvider
+from workbench.providers import MockProvider, OpenAIProvider
 from workbench.repository import Repository
 
 DEMO_HASH = "adb50bebae4e3576c2c96c70866f4d1357888c35b2e13d76d2c88383870fc541"
@@ -410,9 +410,7 @@ def test_unknown_records_and_export_type(client):
 
 def test_providers_disabled_without_keys(client):
     providers = client.get("/api/providers").json()
-    assert [p["enabled"] for p in providers] == [True, False, False, False]
-    with pytest.raises(NotImplementedError):
-        asyncio.run(OllamaProvider().generate(assemble("test")))
+    assert [p["enabled"] for p in providers] == [True, False, True, False]
     request = RunRequest(task="test", provider="openai", model="test-model", cloud_consent=True)
     with pytest.raises(RuntimeError):
         asyncio.run(OpenAIProvider(request).generate(assemble("test")))

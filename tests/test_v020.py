@@ -319,7 +319,7 @@ def test_real_agents_sdk_through_mock_http_transport(tmp_path, monkeypatch, mode
     request = RunRequest(
         task="exact task",
         provider="openai",
-        model="requested-snapshot",
+        model="gpt-4o",
         cloud_consent=True,
         delivery_mode=mode,
         sampling=SamplingSettings(temperature=0.2, top_p=0.8, max_output_tokens=123),
@@ -330,7 +330,7 @@ def test_real_agents_sdk_through_mock_http_transport(tmp_path, monkeypatch, mode
     assert exp.status == "COMPLETED"
     assert len(seen) == (6 if mode.endswith("HANDSHAKE") else 3)
     for body in seen:
-        assert body["model"] == "requested-snapshot"
+        assert body["model"] == "gpt-4o"
         assert body["temperature"] == 0.2 and body["top_p"] == 0.8
         assert body["max_output_tokens"] == 123
         assert body["store"] is False and body["truncation"] == "disabled"
@@ -391,7 +391,7 @@ def test_http_errors_do_not_leak_and_hidden_retries_disabled(tmp_path, monkeypat
     request = RunRequest(
         task="error",
         provider="openai",
-        model="explicit",
+        model="gpt-4o",
         cloud_consent=True,
         artifact_id=None,
         max_retries=1,
@@ -557,7 +557,7 @@ def test_incomplete_provider_output_does_not_succeed(tmp_path, monkeypatch):
         )
 
     request = RunRequest(
-        task="incomplete", artifact_id=None, provider="openai", model="explicit", cloud_consent=True
+        task="incomplete", artifact_id=None, provider="openai", model="gpt-4o", cloud_consent=True
     )
     ctrl = controller(tmp_path)
     ctrl.provider = OpenAIProvider(request, factory)
