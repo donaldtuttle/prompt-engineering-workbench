@@ -9,6 +9,7 @@ from .models import CallRecord, Experiment, Message, ProviderResult, Run, RunReq
 from .providers import (
     ClaudeProvider,
     MockProvider,
+    OllamaProvider,
     OpenAIProvider,
     claude_available,
     cloud_available,
@@ -26,7 +27,11 @@ def configuration_hash(run):
         "replicate_index": run.replicate_index,
         "provider_versions": run.provider_versions,
         "execution_settings": run.execution_settings,
-        "api_mode": {"openai": "responses", "claude": "messages"}.get(run.provider, "fixture"),
+        "api_mode": {
+            "openai": "responses",
+            "claude": "messages",
+            "ollama": "chat",
+        }.get(run.provider, "fixture"),
         "tracing": False,
         "tools": [],
         "store": False,
@@ -39,6 +44,8 @@ def _default_provider(request):
         return OpenAIProvider(request)
     if request.provider == "claude":
         return ClaudeProvider(request)
+    if request.provider == "ollama":
+        return OllamaProvider(request)
     return MockProvider(request)
 
 
@@ -58,7 +65,7 @@ class Controller:
         exp = Experiment(
             request=request, task_sha256=digest(request.task.encode()), artifact=snapshot
         )
-        if request.provider in ("openai", "claude"):
+        if request.provider in ("openai", "claude", "ollama"):
             exp.evidence_scope = "UNBLINDED_MODEL_OUTPUT; evaluation not performed"
         kinds = (
             ["BASELINE", "FULL_INJECTOR", "NEUTRAL_LENGTH_CONTROL"] if snapshot else ["BASELINE"]
@@ -80,9 +87,13 @@ class Controller:
                         "concurrency": request.concurrency,
                     },
                     provider_versions=provider_versions(request.provider),
-                    seed_supported=request.provider == "mock",
+                    seed_supported=request.provider in ("mock", "ollama"),
                     execution=(
-                        "cloud" if request.provider in ("openai", "claude") else "local-offline"
+                        "cloud"
+                        if request.provider in ("openai", "claude")
+                        else "local"
+                        if request.provider == "ollama"
+                        else "local-offline"
                     ),
                 )
                 run.configuration_hash = configuration_hash(run)

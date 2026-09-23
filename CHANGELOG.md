@@ -12,6 +12,14 @@ INSUFFICIENT_EVIDENCE.
   minus max output tokens is refused. The default floor is 200000 (`WORKBENCH_CLAUDE_CONTEXT_FLOOR`).
 - Replay of a Claude experiment requires fresh `cloud_consent`, the same rule as OpenAI.
 
+- Context windows are per model. Confirmed Claude 1M ids use 1,000,000 tokens; other
+  `claude-*` ids stay at 200,000. `gpt-4o` snapshots use 128,000 and `gpt-4.1` snapshots
+  use 1,047,576. Unlisted OpenAI ids are refused. `WORKBENCH_CLAUDE_CONTEXT_FLOOR` and
+  `WORKBENCH_OPENAI_CONTEXT_FLOOR` can only lower those windows.
+- Ollama is a loopback chat adapter. It sends `num_ctx` from that model's reported
+  architecture context length, not the 2048 Modelfile default. A prompt that fills or
+  exceeds the window is refused. `WORKBENCH_OLLAMA_CONTEXT_CAP` can only lower it.
+
 ## 0.2.0 — 2026-09-19
 
 Complete experimental-control and adapter release. Status DEVELOP; live OpenAI smoke unverified.

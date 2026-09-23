@@ -163,7 +163,15 @@ def test_system_slot_injector_is_exact_and_user_only(monkeypatch):
     assert count_tokens[0]["system"] == create_calls[0]["system"]
     assert count_tokens[0]["messages"] == create_calls[0]["messages"]
     gate = result.structured_response["receive_gate"]
-    assert gate == {"context_floor": 200000, "budget": 200000 - 64, "counted_input_tokens": 12}
+    assert gate == {
+        "model": MODEL,
+        "context_floor": 200000,
+        "model_context_window": 200000,
+        "context_floor_source": "model",
+        "budget": 200000 - 64,
+        "counted_input_tokens": 12,
+        "count_source": "anthropic.count_tokens",
+    }
     assert result.response_status == "completed"
 
 
@@ -227,9 +235,13 @@ def test_count_tokens_above_budget_raises_context_window(monkeypatch, tmp_path):
     assert exp.status == "FAILED"
     assert call.error_type == "ValueError"
     assert call.result.structured_response["receive_gate"] == {
+        "model": MODEL,
         "context_floor": 1000,
+        "model_context_window": 200000,
+        "context_floor_source": "env_cap",
         "budget": 900,
         "counted_input_tokens": 901,
+        "count_source": "anthropic.count_tokens",
     }
 
 
@@ -258,14 +270,14 @@ def test_provider_flags_match_adapters_on_this_branch(tmp_path, monkeypatch):
     with TestClient(create_app(tmp_path / "api.db", test_mode=True)) as client:
         body = client.get("/api/providers").json()
     assert [item["id"] for item in body] == ["mock", "openai", "ollama", "claude"]
-    assert [item["enabled"] for item in body] == [True, False, False, False]
+    assert [item["enabled"] for item in body] == [True, False, True, False]
     assert "WORKBENCH_ENABLE_CLAUDE" in body[3]["reason"]
     assert "ANTHROPIC_API_KEY" in body[3]["reason"]
     monkeypatch.setenv("WORKBENCH_ENABLE_CLAUDE", "1")
     monkeypatch.setenv("ANTHROPIC_API_KEY", "synthetic-test-key")
     with TestClient(create_app(tmp_path / "api-on.db", test_mode=True)) as client:
         enabled = {item["id"]: item["enabled"] for item in client.get("/api/providers").json()}
-    assert enabled == {"mock": True, "openai": False, "ollama": False, "claude": True}
+    assert enabled == {"mock": True, "openai": False, "ollama": True, "claude": True}
 
 
 def test_replay_without_cloud_consent_is_400(tmp_path, monkeypatch):

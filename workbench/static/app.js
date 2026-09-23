@@ -174,22 +174,31 @@ function providerChanged() {
   const id = $("provider").value;
   const entry = providerCatalog.find(p => p.id === id);
   const cloud = CLOUD_PROVIDERS.has(id);
+  const localModel = id === "ollama";
   const name = PROVIDER_LABEL[id] || id;
-  $("model").readOnly = !cloud;
-  if (!cloud) $("model").value = "fixture-echo-v2";
+  $("model").readOnly = !(cloud || localModel);
+  if (!cloud && !localModel) $("model").value = "fixture-echo-v2";
   else if ($("model").value.startsWith("fixture-")) $("model").value = "";
-  $("model").placeholder = cloud ? "Enter an exact model or snapshot ID" : "";
+  $("model").placeholder = localModel
+    ? "Exact local model name, such as llama3.1:8b"
+    : cloud ? "Enter an exact model or snapshot ID" : "";
   $("cloud-confirmation").hidden = !cloud;
   $("cloud-consent").required = cloud;
   $("cloud-consent").checked = false;
   $("cloud-consent-label").textContent = `Send this probe and its context to ${name}. API charges apply, including handshake calls and retries.`;
   $("seed").disabled = cloud;
   if (cloud) $("seed").value = "";
-  $("mode-badge").textContent = cloud ? `● ${name.toUpperCase()} CLOUD` : "● OFFLINE FIXTURE MODE";
-  $("charge-note").textContent = cloud ? `${name} API charges apply` : "No API keys · no API charges";
+  $("mode-badge").textContent = cloud
+    ? `● ${name.toUpperCase()} CLOUD`
+    : localModel ? "● OLLAMA LOCAL" : "● OFFLINE FIXTURE MODE";
+  $("charge-note").textContent = cloud
+    ? `${name} API charges apply`
+    : localModel ? "Loopback only · no API key" : "No API keys · no API charges";
   $("mode-notice").textContent = cloud
     ? "The selected cloud provider receives every lane's probe and context. Evaluation is not performed."
-    : "Mock mode runs locally. Synthetic responses test the workbench; no language model is called.";
+    : localModel
+      ? "Ollama runs on this machine. The limit is that model's reported context length. A longer prompt is refused, not truncated."
+      : "Mock mode runs locally. Synthetic responses test the workbench; no language model is called.";
   $("run-button").disabled = id !== "mock" && !entry?.enabled;
 }
 function providerOptionLabel(entry) {

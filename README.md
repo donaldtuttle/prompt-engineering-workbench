@@ -105,13 +105,32 @@ server environment. `ANTHROPIC_BASE_URL` is ignored; the adapter calls `https://
 | --- | --- |
 | `WORKBENCH_ENABLE_CLAUDE` | Set to `1` to allow the Claude adapter |
 | `ANTHROPIC_API_KEY` | Server-side credential; never enter it into the probe or the browser |
-| `WORKBENCH_CLAUDE_CONTEXT_FLOOR` | Optional input budget ceiling; default `200000` |
+| `WORKBENCH_CLAUDE_CONTEXT_FLOOR` | Optional cap. It cannot raise the model's documented window. Unset uses that window. |
 
 Choose **Claude**, enter an explicit model ID, and check the cloud consent box. The adapter
-counts tokens before the Messages call and refuses input that would exceed the floor minus
-the requested max output tokens. `end_turn` and `stop_sequence` are recorded as completed.
-`max_tokens` and every other stop reason are not. This does not score model quality.
-Resolution stays INSUFFICIENT_EVIDENCE.
+counts tokens before the Messages call and refuses input that would exceed that model's
+context window minus the requested max output tokens. Confirmed 1M ids are
+`claude-fable-5-1`, `claude-opus-5`, `claude-opus-5-5`, `claude-opus-4-6`,
+`claude-sonnet-5`, and `claude-sonnet-4-6`, including their dated snapshots. Other
+`claude-*` ids use 200k. An unlisted id is not given a larger window. `end_turn` and
+`stop_sequence` are recorded as completed. `max_tokens` and every other stop reason are
+not. This does not score model quality. Resolution stays INSUFFICIENT_EVIDENCE.
+
+OpenAI uses the same rule for pinned ids: `gpt-4o` and its dated snapshots are 128,000;
+`gpt-4.1` and its dated snapshots are 1,047,576. Any other OpenAI id is refused rather
+than guessed. `WORKBENCH_OPENAI_CONTEXT_FLOOR` can lower that window and cannot raise it.
+Truncation stays disabled.
+
+## Optional local Ollama
+
+Ollama is loopback-only (`127.0.0.1`, `localhost`, or `::1`). Choose **Ollama** and type
+the installed model name. No API key and no cloud consent. Before `/api/chat`, the adapter
+reads that model's architecture `context_length` from `/api/show` and sends it as
+`num_ctx`. A Modelfile `num_ctx` of 2048 is recorded and is not used as the limit. A
+prompt that does not fit, including a count that fills the window, is refused. Ollama
+does not report silent truncation as an error, so a full window is treated as truncation.
+`WORKBENCH_OLLAMA_CONTEXT_CAP` can lower the window for this machine. It cannot raise it
+past the model. This does not score model quality.
 
 ## Reading results
 

@@ -86,7 +86,7 @@ class Run(Schema):
     execution_settings: dict[str, int | float] = Field(default_factory=dict)
     provider_versions: dict[str, str] = Field(default_factory=dict)
     seed_supported: bool = True
-    execution: Literal["local-offline", "cloud"] = "local-offline"
+    execution: Literal["local-offline", "local", "cloud"] = "local-offline"
     replay_of_run_id: str | None = None
     status: Literal["QUEUED", "RUNNING", "SUCCEEDED", "FAILED", "BLOCKED", "INTERRUPTED"] = "QUEUED"
     started_at: str | None = None
@@ -105,7 +105,7 @@ class RunRequest(Schema):
     title: str = Field(default="Untitled experiment", min_length=1, max_length=120)
     probe_id: str = Field(default="manual-probe", min_length=1, max_length=120)
     artifact_id: str | None = "DEMO_OFFLINE_FIXTURE"
-    provider: Literal["mock", "openai", "claude"] = "mock"
+    provider: Literal["mock", "openai", "ollama", "claude"] = "mock"
     model: str = Field(default="fixture-echo-v2", min_length=1, max_length=160)
     delivery_mode: DeliveryMode = "SYSTEM_SLOT"
     replicates: int = Field(default=1, ge=1, le=4)
@@ -141,6 +141,8 @@ class RunRequest(Schema):
                 raise ValueError("Choose an explicit Claude model ID")
             if self.sampling.seed is not None:
                 raise ValueError("This Claude adapter does not support seed; leave it null")
+        if self.provider == "ollama" and self.model.startswith("fixture-"):
+            raise ValueError("Choose an installed Ollama model name")
         return self
 
 
