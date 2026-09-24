@@ -188,6 +188,10 @@ def create_app(
             raise HTTPException(
                 400, "Replay sends stored prompts to Claude; cloud_consent required"
             )
+        if exp.request.provider == "grok" and not options.cloud_consent:
+            raise HTTPException(
+                400, "Replay sends stored prompts to Grok; cloud_consent required"
+            )
         try:
             replayed = await app.state.controller.create(exp.request, replay_id=experiment_id)
         except (ValueError, OSError) as exc:

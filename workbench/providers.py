@@ -15,6 +15,7 @@ from .context_windows import (
     capped_window,
     claude_model_window,
     context_window_error,
+    grok_model_window,
     ollama_context,
     openai_model_window,
     receive_gate,
@@ -41,6 +42,7 @@ def provider_versions(provider):
     packages = {
         "openai": ("openai-agents", "openai"),
         "claude": ("anthropic",),
+        "grok": ("xai-sdk",),
     }.get(provider, ())
     return {name: version(name) for name in packages}
 
@@ -53,8 +55,12 @@ def claude_available():
     return os.getenv("WORKBENCH_ENABLE_CLAUDE") == "1" and bool(os.getenv("ANTHROPIC_API_KEY"))
 
 
+def grok_available():
+    return os.getenv("WORKBENCH_ENABLE_GROK") == "1" and bool(os.getenv("XAI_API_KEY"))
+
+
 def any_cloud_available():
-    return cloud_available() or claude_available()
+    return cloud_available() or claude_available() or grok_available()
 
 
 def provider_catalog():
@@ -85,6 +91,13 @@ def provider_catalog():
             "execution": "cloud",
             "reason": "Requires WORKBENCH_ENABLE_CLAUDE=1 and server-side ANTHROPIC_API_KEY",
             "seed_supported": False,
+        },
+        {
+            "id": "grok",
+            "enabled": grok_available(),
+            "execution": "cloud",
+            "reason": "Requires WORKBENCH_ENABLE_GROK=1 and server-side XAI_API_KEY",
+            "seed_supported": True,
         },
     ]
 
@@ -570,3 +583,189 @@ class OllamaProvider:
         if not isinstance(tokens, list) or any(type(item) is not int for item in tokens):
             raise ValueError("Ollama token count was unreadable")
         return len(tokens)
+
+
+def grok_client_kwargs(timeout):
+    """Explicit host and no gRPC retries. The SDK's default channel retries UNAVAILABLE."""
+    return {
+        "api_key": os.getenv("XAI_API_KEY"),
+        "api_host": "api.x.ai",
+        "timeout": timeout,
+        "channel_options": [("grpc.enable_retries", 0)],
+    }
+
+
+def _grok_prompt_text(messages):
+    return "\n".join(f"{message.role}\n{message.content}" for message in messages)
+
+
+def _grok_token_count(tokens):
+    if isinstance(tokens, list):
+        return len(tokens)
+    value = getattr(tokens, "tokens", None)
+    if isinstance(value, list):
+        return len(value)
+    raise ValueError("Grok token count was unreadable")
+
+
+def _grok_status(reason):
+    if reason == "REASON_STOP":
+        return "completed"
+    if isinstance(reason, str) and reason:
+        return reason
+    return "unknown"
+
+
+def _grok_usage(usage):
+    if usage is None:
+        return None
+    names = {
+        "prompt_tokens": "input_tokens",
+        "completion_tokens": "output_tokens",
+        "total_tokens": "total_tokens",
+        "reasoning_tokens": "reasoning_tokens",
+    }
+    counts = {}
+    for source, dest in names.items():
+        value = usage.get(source) if isinstance(usage, dict) else getattr(usage, source, None)
+        if type(value) is int:
+            counts[dest] = value
+    return counts or None
+
+
+class _XaiTransport:
+    """One tokenize call, then one tool-free chat sample. Imported only on a live run."""
+
+    def __init__(self, **kwargs):
+        if kwargs.get("api_host") != "api.x.ai":
+            raise RuntimeError("Grok endpoint must be api.x.ai")
+        options = dict(kwargs.get("channel_options") or ())
+        if options.get("grpc.enable_retries") != 0:
+            raise RuntimeError("Grok retries must be disabled")
+        from xai_sdk import AsyncClient
+
+        self._client = AsyncClient(**kwargs)
+
+    async def tokenize_text(self, *, text, model):
+        return await self._client.tokenize.tokenize_text(text, model=model)
+
+    async def sample(self, *, model, messages, max_tokens, temperature, top_p, seed):
+        from xai_sdk.chat import assistant, system, user
+
+        builders = {"system": system, "user": user, "assistant": assistant}
+        built = [builders[message["role"]](message["content"]) for message in messages]
+        chat = self._client.chat.create(
+            model=model,
+            messages=built,
+            max_tokens=max_tokens,
+            temperature=temperature,
+            top_p=top_p,
+            seed=seed,
+            store_messages=False,
+            use_encrypted_content=False,
+            max_turns=1,
+        )
+        return await chat.sample()
+
+    async def close(self):
+        await self._client.close()
+
+
+class GrokProvider:
+    """One tool-free xAI chat sample. Tokens are counted with that model's tokenizer."""
+
+    def __init__(self, request, client_factory=None):
+        self.request, self.client_factory = request, client_factory
+
+    async def generate(self, condition: Condition) -> ProviderResult:
+        if not self.client_factory and not grok_available():
+            raise RuntimeError("Grok is disabled or XAI_API_KEY is missing")
+        documented, floor, source = _grok_window(self.request.model)
+        sampling = self.request.sampling
+        budget = floor - sampling.max_output_tokens
+        text = _grok_prompt_text(condition.messages)
+        factory = self.client_factory or _XaiTransport
+        client = factory(**grok_client_kwargs(self.request.timeout_seconds))
+        try:
+            tokens = await client.tokenize_text(text=text, model=self.request.model)
+            counted = _grok_token_count(tokens)
+            gate = receive_gate(
+                model=self.request.model,
+                documented=documented,
+                floor=floor,
+                source=source,
+                budget=budget,
+                counted=counted,
+                count_source="xai.tokenize message text; chat-template overhead is not included",
+            )
+            if budget < 1 or counted > budget:
+                raise context_window_error("Grok", gate)
+            try:
+                response = await client.sample(
+                    model=self.request.model,
+                    messages=[message.model_dump() for message in condition.messages],
+                    max_tokens=sampling.max_output_tokens,
+                    temperature=sampling.temperature,
+                    top_p=sampling.top_p,
+                    seed=sampling.seed,
+                )
+            except Exception as exc:
+                exc.receive_gate = gate
+                raise
+        finally:
+            await client.close()
+        usage = _grok_usage(_response_attr(response, "usage"))
+        server_in = None if usage is None else usage.get("input_tokens")
+        if type(server_in) is int and server_in > budget:
+            gate = receive_gate(
+                model=self.request.model,
+                documented=documented,
+                floor=floor,
+                source=source,
+                budget=budget,
+                counted=server_in,
+                count_source="xai.usage.prompt_tokens",
+            )
+            raise context_window_error("Grok", gate)
+        encrypted = _response_attr(response, "encrypted_content")
+        structured = {"receive_gate": gate}
+        if isinstance(encrypted, str) and encrypted:
+            structured["reasoning_encrypted_omitted"] = True
+        return ProviderResult(
+            raw_response=str(_response_attr(response, "content") or ""),
+            structured_response=structured,
+            token_usage=usage,
+            resolved_model=_optional_str(_response_attr(response, "model")),
+            response_id=_optional_str(_response_attr(response, "id")),
+            response_status=_grok_status(_response_attr(response, "finish_reason")),
+            cost_usd=_optional_float(_response_attr(response, "cost_usd")),
+        )
+
+
+def _grok_window(model):
+    try:
+        documented = grok_model_window(model)
+    except ValueError as exc:
+        exc.receive_gate = receive_gate(
+            model=model,
+            documented=None,
+            floor=None,
+            source="unpinned",
+            budget=None,
+            counted=None,
+            count_source="not_counted",
+        )
+        raise
+    floor, source = capped_window(documented, "WORKBENCH_GROK_CONTEXT_FLOOR")
+    return documented, floor, source
+
+
+def _response_attr(response, name):
+    if isinstance(response, dict):
+        return response.get(name)
+    return getattr(response, name, None)
+
+
+def _optional_float(value):
+    return value if type(value) is float else None
+

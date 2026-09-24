@@ -105,7 +105,7 @@ class RunRequest(Schema):
     title: str = Field(default="Untitled experiment", min_length=1, max_length=120)
     probe_id: str = Field(default="manual-probe", min_length=1, max_length=120)
     artifact_id: str | None = "DEMO_OFFLINE_FIXTURE"
-    provider: Literal["mock", "openai", "ollama", "claude"] = "mock"
+    provider: Literal["mock", "openai", "ollama", "claude", "grok"] = "mock"
     model: str = Field(default="fixture-echo-v2", min_length=1, max_length=160)
     delivery_mode: DeliveryMode = "SYSTEM_SLOT"
     replicates: int = Field(default=1, ge=1, le=4)
@@ -143,6 +143,11 @@ class RunRequest(Schema):
                 raise ValueError("This Claude adapter does not support seed; leave it null")
         if self.provider == "ollama" and self.model.startswith("fixture-"):
             raise ValueError("Choose an installed Ollama model name")
+        if self.provider == "grok":
+            if not self.cloud_consent:
+                raise ValueError("Cloud runs require explicit cloud_consent")
+            if self.model.startswith("fixture-"):
+                raise ValueError("Choose an explicit Grok model ID")
         return self
 
 

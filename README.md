@@ -132,6 +132,26 @@ does not report silent truncation as an error, so a full window is treated as tr
 `WORKBENCH_OLLAMA_CONTEXT_CAP` can lower the window for this machine. It cannot raise it
 past the model. This does not score model quality.
 
+## Optional Grok execution
+
+Grok is off unless both variables are set. The adapter talks only to `api.x.ai`, with the
+SDK's hidden UNAVAILABLE retries turned off. One tokenize call, then one chat sample.
+Tools are not added, stored messages are off, and encrypted reasoning content is not
+written into the local record.
+
+| Variable | Meaning |
+| --- | --- |
+| `WORKBENCH_ENABLE_GROK` | Set to `1` to allow the Grok adapter |
+| `XAI_API_KEY` | Server-side credential; never enter it into the probe or the browser |
+| `WORKBENCH_GROK_CONTEXT_FLOOR` | Optional cap. It cannot raise the model's documented window |
+
+Pinned windows, from the xAI model pages: `grok-4.7`, `grok-4.6`, `grok-4.5`, and
+`grok-4.5-latest` are 500,000. `grok-4`, `grok-4-0709`, and `grok-4-latest` are 256,000.
+Any other id is refused. The pre-count uses xAI's tokenizer on the role-labeled message
+text. It is not `o200k_base`, and it does not include chat-template overhead. If the
+server then reports more prompt tokens than the budget, the run is failed rather than
+stored as a success. Seed is forwarded. This does not score model quality.
+
 ## Reading results
 
 Each lane shows its condition, replicate, provider, status, requested/returned model,

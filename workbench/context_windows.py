@@ -7,6 +7,8 @@ which can refuse a long prompt and cannot silently enlarge the window.
 
 OpenAI ids were read from developers.openai.com model pages. Dated snapshots of
 those ids share the page's window. Other OpenAI ids are unpinned.
+
+Grok ids were read from docs.x.ai model pages. Only those exact ids are pinned.
 """
 
 import os
@@ -24,6 +26,16 @@ _OPENAI = (
     ("gpt-4.1", 1_047_576),
     ("gpt-4o", 128_000),
 )
+# Exact ids from docs.x.ai model pages. grok-4 must not inherit grok-4.7's window.
+_GROK = {
+    "grok-4.7": 500_000,
+    "grok-4.6": 500_000,
+    "grok-4.5": 500_000,
+    "grok-4.5-latest": 500_000,
+    "grok-4": 256_000,
+    "grok-4-0709": 256_000,
+    "grok-4-latest": 256_000,
+}
 
 
 def _id_match(model, prefix):
@@ -45,6 +57,13 @@ def openai_model_window(model):
     if not matches:
         return None
     return min(matches)
+
+
+def grok_model_window(model):
+    try:
+        return _GROK[model]
+    except KeyError as exc:
+        raise ValueError("No pinned context window for this Grok model") from exc
 
 
 def capped_window(documented, env_name):

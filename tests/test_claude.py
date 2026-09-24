@@ -265,19 +265,21 @@ def test_provider_flags_match_adapters_on_this_branch(tmp_path, monkeypatch):
         "OPENAI_API_KEY",
         "WORKBENCH_ENABLE_CLAUDE",
         "ANTHROPIC_API_KEY",
+        "WORKBENCH_ENABLE_GROK",
+        "XAI_API_KEY",
     ):
         monkeypatch.delenv(name, raising=False)
     with TestClient(create_app(tmp_path / "api.db", test_mode=True)) as client:
         body = client.get("/api/providers").json()
-    assert [item["id"] for item in body] == ["mock", "openai", "ollama", "claude"]
-    assert [item["enabled"] for item in body] == [True, False, True, False]
+    assert [item["id"] for item in body] == ["mock", "openai", "ollama", "claude", "grok"]
+    assert [item["enabled"] for item in body] == [True, False, True, False, False]
     assert "WORKBENCH_ENABLE_CLAUDE" in body[3]["reason"]
     assert "ANTHROPIC_API_KEY" in body[3]["reason"]
     monkeypatch.setenv("WORKBENCH_ENABLE_CLAUDE", "1")
     monkeypatch.setenv("ANTHROPIC_API_KEY", "synthetic-test-key")
     with TestClient(create_app(tmp_path / "api-on.db", test_mode=True)) as client:
         enabled = {item["id"]: item["enabled"] for item in client.get("/api/providers").json()}
-    assert enabled == {"mock": True, "openai": False, "ollama": True, "claude": True}
+    assert enabled == {"mock": True, "openai": False, "ollama": True, "claude": True, "grok": False}
 
 
 def test_replay_without_cloud_consent_is_400(tmp_path, monkeypatch):
