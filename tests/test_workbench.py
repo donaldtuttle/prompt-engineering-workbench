@@ -410,7 +410,7 @@ def test_unknown_records_and_export_type(client):
 
 def test_providers_disabled_without_keys(client):
     providers = client.get("/api/providers").json()
-    assert [p["enabled"] for p in providers] == [True, False, True, False]
+    assert [p["enabled"] for p in providers] == [True, False, True, False, False]
     request = RunRequest(task="test", provider="openai", model="test-model", cloud_consent=True)
     with pytest.raises(RuntimeError):
         asyncio.run(OpenAIProvider(request).generate(assemble("test")))

@@ -8,11 +8,13 @@ from .conditions import assemble, verify_condition, with_messages
 from .models import CallRecord, Experiment, Message, ProviderResult, Run, RunRequest, now
 from .providers import (
     ClaudeProvider,
+    GrokProvider,
     MockProvider,
     OllamaProvider,
     OpenAIProvider,
     claude_available,
     cloud_available,
+    grok_available,
     provider_versions,
 )
 from .repository import Repository
@@ -31,6 +33,7 @@ def configuration_hash(run):
             "openai": "responses",
             "claude": "messages",
             "ollama": "chat",
+            "grok": "chat",
         }.get(run.provider, "fixture"),
         "tracing": False,
         "tools": [],
@@ -46,6 +49,8 @@ def _default_provider(request):
         return ClaudeProvider(request)
     if request.provider == "ollama":
         return OllamaProvider(request)
+    if request.provider == "grok":
+        return GrokProvider(request)
     return MockProvider(request)
 
 
@@ -65,7 +70,7 @@ class Controller:
         exp = Experiment(
             request=request, task_sha256=digest(request.task.encode()), artifact=snapshot
         )
-        if request.provider in ("openai", "claude", "ollama"):
+        if request.provider in ("openai", "claude", "ollama", "grok"):
             exp.evidence_scope = "UNBLINDED_MODEL_OUTPUT; evaluation not performed"
         kinds = (
             ["BASELINE", "FULL_INJECTOR", "NEUTRAL_LENGTH_CONTROL"] if snapshot else ["BASELINE"]
@@ -87,10 +92,10 @@ class Controller:
                         "concurrency": request.concurrency,
                     },
                     provider_versions=provider_versions(request.provider),
-                    seed_supported=request.provider in ("mock", "ollama"),
+                    seed_supported=request.provider in ("mock", "ollama", "grok"),
                     execution=(
                         "cloud"
-                        if request.provider in ("openai", "claude")
+                        if request.provider in ("openai", "claude", "grok")
                         else "local"
                         if request.provider == "ollama"
                         else "local-offline"
@@ -118,6 +123,8 @@ class Controller:
             raise ValueError("OpenAI is disabled or its server-side key is missing")
         if request.provider == "claude" and not claude_available():
             raise ValueError("Claude is disabled or its server-side key is missing")
+        if request.provider == "grok" and not grok_available():
+            raise ValueError("Grok is disabled or its server-side key is missing")
         await self._admit()
         owner = asyncio.current_task()
         self.creations.add(owner)

@@ -20,6 +20,13 @@ INSUFFICIENT_EVIDENCE.
   architecture context length, not the 2048 Modelfile default. A prompt that fills or
   exceeds the window is refused. `WORKBENCH_OLLAMA_CONTEXT_CAP` can only lower it.
 
+- Added an opt-in Grok adapter. It runs only when `WORKBENCH_ENABLE_GROK=1` and
+  `XAI_API_KEY` are both set. The host is `api.x.ai`, gRPC retries are off, and each
+  call is one tokenize plus one tool-free chat sample.
+- Grok windows are pinned per model id: 500,000 for `grok-4.7`, `grok-4.6`, `grok-4.5`,
+  and `grok-4.5-latest`; 256,000 for `grok-4`, `grok-4-0709`, and `grok-4-latest`.
+  Other ids are refused. The count is xAI's tokenizer, not o200k_base.
+
 ## 0.2.0 — 2026-09-19
 
 Complete experimental-control and adapter release. Status DEVELOP; live OpenAI smoke unverified.

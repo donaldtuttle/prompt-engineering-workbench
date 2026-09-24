@@ -2,8 +2,9 @@
 const $ = id => document.getElementById(id);
 let artifacts = [], providerCatalog = [], selectedRecord = null, activeId = null, pollTimer = null;
 const terminal = new Set(["COMPLETED", "PARTIAL", "FAILED", "INTERRUPTED"]);
-const CLOUD_PROVIDERS = new Set(["openai", "claude"]);
-const PROVIDER_LABEL = {openai: "OpenAI", claude: "Claude", ollama: "Ollama"};
+const CLOUD_PROVIDERS = new Set(["openai", "claude", "grok"]);
+const SEEDLESS_PROVIDERS = new Set(["openai", "claude"]);
+const PROVIDER_LABEL = {openai: "OpenAI", claude: "Claude", ollama: "Ollama", grok: "Grok"};
 const example = "A study reports improved answers after adding a detailed instruction block.\n\nIdentify what the result supports, two alternative explanations, and one controlled follow-up test. Separate observations from speculation.";
 
 function node(tag, text, className) {
@@ -186,15 +187,17 @@ function providerChanged() {
   $("cloud-consent").required = cloud;
   $("cloud-consent").checked = false;
   $("cloud-consent-label").textContent = `Send this probe and its context to ${name}. API charges apply, including handshake calls and retries.`;
-  $("seed").disabled = cloud;
-  if (cloud) $("seed").value = "";
+  $("seed").disabled = SEEDLESS_PROVIDERS.has(id);
+  if (SEEDLESS_PROVIDERS.has(id)) $("seed").value = "";
   $("mode-badge").textContent = cloud
     ? `● ${name.toUpperCase()} CLOUD`
     : localModel ? "● OLLAMA LOCAL" : "● OFFLINE FIXTURE MODE";
   $("charge-note").textContent = cloud
     ? `${name} API charges apply`
     : localModel ? "Loopback only · no API key" : "No API keys · no API charges";
-  $("mode-notice").textContent = cloud
+  $("mode-notice").textContent = id === "grok"
+    ? "Grok receives every lane. The limit is that model id's documented window, and a longer prompt is refused. The count uses xAI's tokenizer, not the workbench o200k tokenizer."
+    : cloud
     ? "The selected cloud provider receives every lane's probe and context. Evaluation is not performed."
     : localModel
       ? "Ollama runs on this machine. The limit is that model's reported context length. A longer prompt is refused, not truncated."
