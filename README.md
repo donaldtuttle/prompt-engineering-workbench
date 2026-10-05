@@ -15,7 +15,7 @@ length-matched control. It keeps the inputs, the hashes, and the run record.
 ## Why care?
 
 A longer prompt can change an answer even when the added text does nothing.
-Matching context length separates "more tokens" from "this injector." The
+Matching context length separates "more tokens" from "this injector". The
 comparison is unblinded. It does not score quality, and injector effectiveness
 is still unverified.
 
