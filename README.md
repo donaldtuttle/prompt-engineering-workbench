@@ -7,6 +7,25 @@ injector, and length-control conditions, preserving the inputs, and reviewing sa
 HTTP transport are verified. A real OpenAI model has not been called for this release.
 Live-account compatibility, model availability, and injector effectiveness remain unverified.
 
+## What is this?
+
+A local harness that runs one probe three ways: baseline, full injector, and a
+length-matched control. It keeps the inputs, the hashes, and the run record.
+
+## Why care?
+
+A longer prompt can change an answer even when the added text does nothing.
+Matching context length separates "more tokens" from "this injector." The
+comparison is unblinded. It does not score quality, and injector effectiveness
+is still unverified.
+
+## Try this
+
+Follow [Run locally](#run-locally). Keep **Mock**, load the example, and run
+the experiment. A valid artifact creates three lanes per replicate. No artifact
+creates baseline only. This checks the harness. It is not evidence that an
+injector works.
+
 This is a complete source release. Existing users: read [UPGRADE.md](UPGRADE.md) first.
 
 ## Three-Lane Probe companion
