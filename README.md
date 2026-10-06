@@ -202,6 +202,20 @@ Linux needs a Chromium-compatible system runtime. The script owns port 8765 temp
 and uses isolated databases/reference copies under test-results. Stop your normal server first.
 No paid model call is part of the test suite or browser smoke script.
 
+## License and permission
+
+Copyright (c) 2026 Donald Tuttle. All rights reserved. Original project material
+is proprietary; use, modification, or redistribution requiring authorization
+needs Donald Tuttle's prior written permission. See [LICENSE](LICENSE) and
+[third-party notices](THIRD_PARTY_NOTICES.md). This is not an open source license.
+Rights granted by applicable law or GitHub's terms remain unaffected.
+
+A license does not make a public repository private. Never commit credentials,
+private injectors, or confidential experiment records. Keep credentials in local
+environment variables or an approved secret store. Obtain explicit owner
+permission before publishing private project material, and remove secrets from
+any approved export. `.env.example` is a template, not a place for live keys.
+
 ## Data and limits
 
 - Run one server process/worker per database. No cloud hosting, account system, or tunnel.
