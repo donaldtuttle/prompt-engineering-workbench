@@ -1,11 +1,14 @@
 # Three-Lane Probe — offline protocol reconstruction
 
-[Original Grok app](https://cactus-umbra-vivid-lunar.grok.me/)
+[Published app](https://cactus-umbra-vivid-lunar.grok.me/)
+· [Viewport source](https://github.com/donaldtuttle/three-lane-probe)
 · [Source inspection and remaining work](../../docs/THREE_LANE_RECONSTRUCTION.md)
 
 **DEVELOP / partial reconstruction.** This Python module reproduces the observable
 DEMO message assembly, prompt hashing, three delivery modes, tamper blocking, and
 offline call records. It is not a recovered copy of the Grok server or its browser UI.
+
+The later viewport source, including the live page, is in three-lane-probe. This module remains the offline reconstruction only.
 
 The module is separate from the v0.2.0 harness. It imports only the Python standard
 library, sends nothing over the network, and writes JSON to stdout. It does not load
