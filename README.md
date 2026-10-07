@@ -30,11 +30,12 @@ This is a complete source release. Existing users: read [UPGRADE.md](UPGRADE.md)
 
 ## Three-Lane Probe companion
 
-[Open the original Grok demo](https://cactus-umbra-vivid-lunar.grok.me/) — a public
-DEMO-only viewport of the three-condition idea, separate from this local harness.
+**Try the app:** [Three-Lane Probe](https://cactus-umbra-vivid-lunar.grok.me/)
+
+That page is the published viewport. It is not this harness. The current viewport
+source is [three-lane-probe](https://github.com/donaldtuttle/three-lane-probe).
 The [offline protocol reconstruction](examples/three_lane_probe/README.md) reproduces
-its message assembly, hashes, delivery modes, and tamper checks without API keys.
-**Partial / DEVELOP:** the browser UI and live Grok backend have not been ported.
+the public DEMO assembly, hashes, delivery modes, and tamper checks without API keys.
 See [source inspection, tests, and remaining work](docs/THREE_LANE_RECONSTRUCTION.md).
 
 ## Run locally
