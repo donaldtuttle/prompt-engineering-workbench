@@ -18,6 +18,7 @@ from .providers import (
     provider_versions,
 )
 from .repository import Repository
+from .token_parity import ProviderTokenCounter, measure_pair
 
 
 def configuration_hash(run):
@@ -345,6 +346,32 @@ class Controller:
 
         try:
             await save()
+            counter = ProviderTokenCounter(exp.request, provider)
+            exp.token_parity = []
+            # Finish count-only checks before any generation. Recheck replay inputs;
+            # historical parity claims are never copied into a new experiment.
+            for replicate in range(exp.request.replicates):
+                pair = {
+                    run.condition_id: run
+                    for run in exp.runs
+                    if run.replicate_index == replicate and run.status != "BLOCKED"
+                }
+                full, control = pair.get("FULL_INJECTOR"), pair.get("NEUTRAL_LENGTH_CONTROL")
+                if full is None or control is None:
+                    continue
+                async with self.limiter:
+                    parity = await measure_pair(
+                        exp.request, full, control, counter, replay=bool(exp.replay_mode)
+                    )
+                exp.token_parity.append(parity)
+                if not parity.generation_allowed:
+                    for run in (full, control):
+                        run.status, run.ended_at = "BLOCKED", now()
+                        run.errors.append(
+                            f"Provider token parity: context={parity.context_status}, "
+                            f"input={parity.input_status}. See token_parity evidence."
+                        )
+                await save()
             async with asyncio.TaskGroup() as group:
                 for run in exp.runs:
                     group.create_task(lane(run))

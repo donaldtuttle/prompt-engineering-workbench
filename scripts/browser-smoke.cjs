@@ -67,6 +67,13 @@ const { chromium } = require(process.env.WORKBENCH_PLAYWRIGHT || 'playwright');
     assert.equal(record.experiment.request.task, task);
     assert.equal(record.experiment.runs.length, 3);
     assert.equal(record.experiment.artifact.identity.status, 'VALID');
+    assert.equal(record.experiment.token_parity[0].context_status, 'MATCHED');
+    assert.equal(record.experiment.token_parity[0].input_status, 'MATCHED');
+    assert.equal(record.experiment.token_parity[0].total_provider_input_parity, 'NOT_ESTABLISHED');
+    const parityCard = page.locator('[data-condition="NEUTRAL_LENGTH_CONTROL"]');
+    assert.match(await parityCard.textContent(), /Provider token parity: context MATCHED/);
+    await parityCard.getByText('Token measurement method and limits', { exact: true }).click();
+    assert.match(await parityCard.locator('details pre').textContent(), /Mock fixture only/);
     await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
     await page.screenshot({ path: path.join(output, 'comparison-desktop.png'), fullPage: true });
     const jsonlDownloadPromise = page.waitForEvent('download');
@@ -134,6 +141,8 @@ const { chromium } = require(process.env.WORKBENCH_PLAYWRIGHT || 'playwright');
     assert.equal(replayRecord.replay_of_experiment_id, handshakeId);
     assert.deepEqual(replayRecord.runs.map(r => r.final_condition.prompt_hash), handshakeRecord.runs.map(r => r.final_condition.prompt_hash));
     assert.equal(replayRecord.runs.every(r => r.calls.length === 1), true);
+    assert.equal(replayRecord.token_parity[0].input_phase, 'FROZEN_FINAL_PROMPT');
+    assert.notEqual(replayRecord.token_parity[0].injector_run_id, handshakeRecord.token_parity[0].injector_run_id);
     await page.locator('#title').fill('Browser smoke · rejected QOFT artifact');
     await page.locator('#run-button').click();
     await page.locator('#experiment-status.partial').waitFor();
@@ -161,7 +170,8 @@ const { chromium } = require(process.env.WORKBENCH_PLAYWRIGHT || 'playwright');
         'baseline still succeeds', '390px no overflow', 'baseline-only run', 'no JS errors',
         'no external browser requests', 'release sources unchanged', 'handshake two-call transcripts', 'replicate indices',
         'seed settings preserved', 'snapshot replay after disk corruption', 'replay final hashes match',
-        'replay uses one task call', 'invalid neutral control blocked'], output };
+        'replay uses one task call', 'invalid neutral control blocked', 'scoped parity display and export',
+        'parity uncertainty details', 'replay measurement uses new run IDs'], output };
     await fs.writeFile(path.join(output, 'browser-report.json'), JSON.stringify(report, null, 2) + '\n');
     console.log(JSON.stringify(report, null, 2));
     await context.close();

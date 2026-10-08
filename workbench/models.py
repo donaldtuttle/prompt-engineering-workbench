@@ -155,6 +155,47 @@ class ReplayRequest(Schema):
     cloud_consent: bool = False
 
 
+class TokenMeasurement(Schema):
+    status: Literal["COUNTED", "UNSUPPORTED", "ERROR"]
+    tokens: int | None = Field(default=None, ge=0, strict=True)
+    method: str
+    scope: str
+    payload_sha256: str | None = None
+    tokenizer: str | None = None
+    tokenizer_sha256: str | None = None
+    tokenizer_version: str | None = None
+    uncertainty: str
+    error_type: str | None = None
+
+
+ParityStatus = Literal["MATCHED", "MISMATCHED", "UNSUPPORTED", "ERROR"]
+
+
+class TokenParity(Schema):
+    version: Literal["provider-token-parity-v1"] = "provider-token-parity-v1"
+    measured_at: str = Field(default_factory=now)
+    provider: str
+    model: str
+    replicate_index: int
+    injector_run_id: str
+    control_run_id: str
+    injector_sha256: str
+    control_sha256: str
+    injector_prompt_hash: str
+    control_prompt_hash: str
+    context_status: ParityStatus
+    input_status: ParityStatus
+    injector_context: TokenMeasurement
+    control_context: TokenMeasurement
+    injector_input: TokenMeasurement
+    control_input: TokenMeasurement
+    generation_allowed: bool
+    input_phase: Literal["INITIAL", "FROZEN_FINAL_PROMPT"]
+    total_provider_input_parity: Literal["NOT_ESTABLISHED"] = "NOT_ESTABLISHED"
+    semantic_neutrality: Literal["NOT_ESTABLISHED"] = "NOT_ESTABLISHED"
+    note: str
+
+
 class Experiment(Schema):
     schema_version: Literal["workbench-experiment-v2"] = "workbench-experiment-v2"
     experiment_id: str = Field(default_factory=uid)
@@ -168,6 +209,7 @@ class Experiment(Schema):
     artifact: ArtifactSnapshot | None = None
     replay_of_experiment_id: str | None = None
     replay_mode: Literal["FROZEN_FINAL_PROMPT"] | None = None
+    token_parity: list[TokenParity] | None = None
     runs: list[Run] = Field(default_factory=list)
 
 

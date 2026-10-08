@@ -155,7 +155,8 @@ past the model. This does not score model quality.
 ## Optional Grok execution
 
 Grok is off unless both variables are set. The adapter talks only to `api.x.ai`, with the
-SDK's hidden UNAVAILABLE retries turned off. One tokenize call, then one chat sample.
+SDK's hidden UNAVAILABLE retries turned off. Provider parity checks run before the lanes;
+each generation call still uses one budget tokenize call, then one chat sample.
 Tools are not added, stored messages are off, and encrypted reasoning content is not
 written into the local record.
 
@@ -180,8 +181,16 @@ the complete input snapshots, settings, phase-call records, and results.
 
 The comparison is **unblinded**. Evaluation remains null and resolution remains
 INSUFFICIENT_EVIDENCE. No screenshot or human impression from this view is a scored outcome.
-Token-length matching controls one difference; it does not make repeated text semantically
-inert or establish that the chosen tokenizer equals the provider's tokenizer.
+New artifact experiments validate the existing injector and control with the selected
+provider's count-only path before generation. Context and assembled-input counts, methods,
+hashes, and limitations appear under **Token measurement method and limits** and in the
+`token_parity` export field. Mismatching, unsupported, or failed checks block both context
+lanes; baseline can still run. Old records are not backfilled with a parity claim.
+
+Matching applies to the recorded scope. Grok text tokenization excludes chat-template
+overhead; Claude's message counts are estimates. Repeated text is not established as
+semantically inert, and matching counts do not prove effectiveness. See
+[provider token parity](docs/TOKEN_PARITY.md), including the frozen-handshake replay rule.
 
 ## Verify the release
 

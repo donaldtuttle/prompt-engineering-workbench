@@ -37,7 +37,7 @@ function renderArtifact() {
   const conditions = artifact?.status === "VALID" ? 3 : 1;
   const replicas = Number($("replicates").value) || 1;
   const calls = conditions * replicas * ($("delivery").value === "USER_PASTE_WITH_HANDSHAKE" ? 2 : 1);
-  $("lane-preview").textContent = (conditions === 3 ? "Baseline + Injector + Neutral control" : "Baseline only" + (artifact ? " · other conditions blocked" : "")) + ` · ${calls} calls before retries`;
+  $("lane-preview").textContent = (conditions === 3 ? "Baseline + Injector + Neutral control" : "Baseline only" + (artifact ? " · other conditions blocked" : "")) + ` · ${calls} generation calls before retries; provider token checks also run`;
   if (!artifact) {
     detail.append(node("p", "Only the task is submitted. No injector is loaded or included."));
     return;
@@ -85,14 +85,23 @@ function renderRecord(exp) {
     const head = node("div", undefined, "response-head"), title = node("h3", `${run.condition_id.replaceAll("_", " ")} · R${(run.replicate_index ?? 0) + 1}`);
     title.append(node("span", `· ${run.provider}`)); head.append(title, badge(run.status));
     const body = node("div", undefined, "response-body");
-    body.append(node("pre", run.result?.raw_response ?? (run.status === "BLOCKED" ? "Treatment not submitted.\nThe artifact failed integrity verification.\n\nIts original bytes and diagnostics are preserved in this record." : `${run.status} — no response available.`)));
+    body.append(node("pre", run.result?.raw_response ?? (run.status === "BLOCKED" ? "Context lane not submitted.\nSee the saved integrity or token parity diagnostics below." : `${run.status} — no response available.`)));
     const foot = node("div", undefined, "response-foot"), stats = node("div", undefined, "response-stats");
     for (const text of [`${run.latency_ms ?? "—"} ms`, `Tokens: ${run.result?.token_usage ? JSON.stringify(run.result.token_usage) : "unavailable"}`, `Cost: ${run.result?.cost_usd ?? "unavailable"}`, `Retries: ${run.retries}`]) stats.append(node("span", text));
     foot.append(stats);
     if (run.errors.length) foot.append(node("div", run.errors.join("\n"), "response-errors"));
     foot.append(node("p", `${run.delivery_mode || "SYSTEM_SLOT"} · requested: ${run.model} · resolved: ${run.resolved_model || "unavailable"}`));
     hashField(foot, "FINAL PROMPT SHA-256", (run.final_condition || run.condition)?.prompt_hash);
-    if (run.condition?.control_metadata) foot.append(node("p", `Length control: ${run.condition.control_metadata.control_tokens} o200k_base context tokens`));
+    if (run.condition?.control_metadata) foot.append(node("p", `Control construction: ${run.condition.control_metadata.control_tokens} o200k_base context tokens`));
+    if (run.condition_id !== "BASELINE") {
+      const parity = exp.token_parity?.find(p => p.injector_run_id === run.run_id || p.control_run_id === run.run_id);
+      if (parity) {
+        foot.append(node("p", `Provider token parity: context ${parity.context_status} (${parity.injector_context.tokens ?? "?"} / ${parity.control_context.tokens ?? "?"}); input ${parity.input_status} (${parity.injector_input.tokens ?? "?"} / ${parity.control_input.tokens ?? "?"}). Total provider input parity remains unestablished.`));
+        const detail = node("details");
+        detail.append(node("summary", "Token measurement method and limits"), node("pre", JSON.stringify(parity, null, 2)));
+        foot.append(detail);
+      } else foot.append(node("p", "Provider token parity: not measured in this record."));
+    }
     if (run.calls?.some(c => c.phase === "HANDSHAKE")) {
       const d = node("details"), p = node("pre", run.calls.filter(c => c.phase === "HANDSHAKE").map(c => c.result?.raw_response || c.error_type || "pending").join("\n"));
       d.append(node("summary", "Stored handshake response"), p); foot.append(d);
