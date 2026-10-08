@@ -28,6 +28,26 @@ injector works.
 
 This is a complete source release. Existing users: read [UPGRADE.md](UPGRADE.md) first.
 
+## What is this?
+
+A local workbench for running a probe with and without an instruction artifact,
+adding a token-length control, and saving the exact inputs and responses.
+
+## Why care?
+
+Suppose a long system prompt seems to improve an answer. Was it the instructions,
+the extra context, or an uncontrolled change between runs? The workbench keeps
+the conditions and records visible so you can prepare a controlled comparison.
+Its comparison view does not itself score effectiveness.
+
+## Try this
+
+Follow [Run locally](#run-locally), load the example, keep **Mock**, select the
+demo artifact, and click **Run experiment**. Inspect the three lanes and export
+their records. Mock mode demonstrates the workflow without a model call; use
+it to learn the controls before designing a real evaluation.
+
+
 ## Three-Lane Probe companion
 
 **Try the app:** [Three-Lane Probe](https://cactus-umbra-vivid-lunar.grok.me/)
