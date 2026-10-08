@@ -3,6 +3,7 @@
 import asyncio
 import json
 import os
+from collections.abc import Sequence
 from functools import lru_cache
 from importlib.metadata import version
 from typing import Protocol
@@ -600,10 +601,17 @@ def _grok_prompt_text(messages):
 
 
 def _grok_token_count(tokens):
-    if isinstance(tokens, list):
-        return len(tokens)
-    value = getattr(tokens, "tokens", None)
-    if isinstance(value, list):
+    # xai-sdk 1.19 returns a protobuf RepeatedCompositeContainer, not a list.
+    value = getattr(tokens, "tokens", tokens)
+    if (
+        isinstance(value, Sequence)
+        and not isinstance(value, (str, bytes, bytearray))
+        and all(
+            (type(item) is int and item >= 0)
+            or (type(getattr(item, "token_id", None)) is int and item.token_id >= 0)
+            for item in value
+        )
+    ):
         return len(value)
     raise ValueError("Grok token count was unreadable")
 
@@ -768,4 +776,3 @@ def _response_attr(response, name):
 
 def _optional_float(value):
     return value if type(value) is float else None
-

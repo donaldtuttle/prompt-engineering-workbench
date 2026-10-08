@@ -47,7 +47,13 @@ condition does not falsely label that original injector as its delivered context
 
 This is a named content comparator. Repetition and semantic content can themselves affect
 models; semantic neutrality is NOT_ESTABLISHED. The text is not byte matched.
-An explicit model-specific tokenizer check is required before interpreting live comparisons.
+New executions perform a provider-specific count-only preflight, described in
+[TOKEN_PARITY.md](TOKEN_PARITY.md). It measures both isolated contexts and assembled inputs,
+records the method, scope, counts, hashes, and uncertainty, and blocks context lanes when
+the available scoped measurements do not match. Unsupported tokenization is never replaced
+by an o200k_base guess. The existing generator and exact saved control text are unchanged.
+This check is still required before interpreting live comparisons; historical records with
+no evidence remain unverified. Scoped parity does not establish exact provider input parity.
 The returned provider token usage measures total calls, including task/protocol overhead;
 it is distinct from the construction count. Generated handshake lengths need not match.
 

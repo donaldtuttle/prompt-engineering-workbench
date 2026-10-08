@@ -57,3 +57,13 @@ historical scope; this release implements the subsequently approved scope.
     data changes. Source releases contain no runtime databases, environment, cache, key, or Git internals.
 22. Use official documentation and inspect the pinned SDK source for implementation contracts.
     Docs references are in OPENAI_ADAPTER.md. A paid smoke test is distinct from the mock-transport gate.
+
+## Provider parity follow-up, 2026-10-08
+
+The original release decisions above remain historical. New executions retain the original
+control generator and add provider-specific count-only validation before context lanes run.
+Record separate context and assembled-input comparisons, method/hash provenance, and explicit
+overhead uncertainty. Block mismatches, unsupported counts, and errors without rewriting
+controls. Frozen handshake replay may preserve a measured input mismatch from stored replies;
+context parity and readable input counts are still required. See [TOKEN_PARITY.md](TOKEN_PARITY.md).
+This adds no model-effect result, live-provider verification, artifact change, or release.
